@@ -4,15 +4,68 @@
 	<title></title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+	<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-black.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
+
 </head>
 <body>
-	<div class="container">
-		dadsfafd
-	</div>
-</body>
 
+	<div class="w3-container">
+
+		<h2 class='w3-center'>header text</h2>
+
+		<label><b>City or Zipcode</b></label>
+		<!-- <div class="w3-bar"> -->
+
+		<div class="w3-row">
+			<input class="w3-input w3-theme w3-border " name="zipcity" id="searchStoreInput" type="text">
+			<button class="w3-button w3-center fa fa-search w3-block w3-col s10" id="searchStoreGo"></button>
+		</div>
+		<!-- </div> -->
+	</div>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script>
+		$(readyFn);
+		function readyFn() {
+			$("#searchStoreInput").keypress(searchStoreFn);
+			$("#searchGo").click(searchStoreGoFn);
+
+		}
+		function searchStoreFn(e) {
+		}
+
+		function searchStoreGoFn(e) {
+			var searchTxt = $('#searchStoreInput');
+			if (searchTxt.val() === undefined || searchTxt.val() === '')
+				return false;
+
+			client.storeSearch(searchTxt.val());
+		}
+
+
+		function runStoreSearch(searchText) {
+
+
+		}
+
+		var apiClient = (function (client) {
+			console.log(client);
+			console.log("asdf");
+			client.storeSearch = function (searchText) {
+				$.ajax({
+
+				}).done(displayEngine.displayStores);
+			};
+
+			return client;
+		})(function () { });
+
+		var displayEngine = (function (engine) {
+			engine.diplayStores = function (storeData) {
+			};
+			return engine;
+		})(function () { });
+	</script>
+</body>
 </html>
