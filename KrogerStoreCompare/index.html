@@ -7,7 +7,15 @@
 	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 	<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-black.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
+	<style>
+		button, input, a {
+			outline: none;
+		}
 
+		#searchStoreGo {
+			font-size: x-large;
+		}
+	</style>
 </head>
 <body>
 
@@ -20,7 +28,27 @@
 
 		<div class="w3-row">
 			<input class="w3-input w3-theme w3-border " name="zipcity" id="searchStoreInput" type="text">
-			<button class="w3-button w3-center fa fa-search w3-block w3-col s10" id="searchStoreGo"></button>
+			<button class="w3-button w3-ripple w3-center fa fa-search w3-block w3-col" id="searchStoreGo"></button>
+		</div>
+		<div class="w3-row">
+			<div class="w3-card w3-third">
+				<header class="w3-container">
+					<h3>Store</h3>
+					<div class="w3-container"> <p> some info</p></div>
+					<footer class="w3-container"><h5>footer </h5></footer>
+			</div>
+			<div class="w3-card w3-third">
+				<header class="w3-container">
+					<h3>Store</h3>
+					<div class="w3-container"> <p> some info</p></div>
+					<footer class="w3-container"><h5>footer </h5></footer>
+			</div>
+			<div class="w3-card w3-third">
+				<header class="w3-container">
+					<h3>Store</h3>
+					<div class="w3-container"> <p> some info</p></div>
+					<footer class="w3-container"><h5>footer </h5></footer>
+			</div>
 		</div>
 		<!-- </div> -->
 	</div>
@@ -33,9 +61,14 @@
 
 		}
 		function searchStoreFn(e) {
+			//If enter is pressed post a search store request.
+			//TODO: disable the search button and turn off enter listener
 		}
 
 		function searchStoreGoFn(e) {
+			//TODO: disable the search button and turn off enter listener
+
+
 			var searchTxt = $('#searchStoreInput');
 			if (searchTxt.val() === undefined || searchTxt.val() === '')
 				return false;
