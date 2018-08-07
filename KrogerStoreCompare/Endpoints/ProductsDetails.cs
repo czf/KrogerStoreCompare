@@ -10,7 +10,6 @@ using Microsoft.Azure.WebJobs.Host;
 using Czf.ApiWrapper.Kroger;
 using Czf.ApiWrapper.Kroger.Domain;
 using Czf.ApiWrapper.Kroger.Requests;
-using Czf.ApiWrapper.Kroger.Responses;
 using KrogerStoreCompare.Domain;
 using Newtonsoft.Json;
 namespace KrogerStoreCompare.Endpoints
@@ -63,15 +62,5 @@ namespace KrogerStoreCompare.Endpoints
             
             return req.CreateResponse(HttpStatusCode.OK, prods.Values);
         }
-
-        
-    }
-    
-      
-
-    
-    public class RespData
-    {
-       
-    }
+    }     
 }
