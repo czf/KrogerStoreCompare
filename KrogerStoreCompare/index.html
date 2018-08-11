@@ -7,6 +7,7 @@
 	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 	<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-black.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.3.5/css/swiper.min.css">
 	<style>
 		button, input, a {
 			outline: none;
@@ -27,37 +28,150 @@
 		<!-- <div class="w3-bar"> -->
 
 		<div class="w3-row">
-			<input class="w3-input w3-theme w3-border " name="zipcity" id="searchStoreInput" type="text">
+			<input class="w3-input w3-theme w3-border " name="zipcity" id="searchStoreInput" type="text" value="asdf">
 			<button class="w3-button w3-ripple w3-center fa fa-search w3-block w3-col" id="searchStoreGo"></button>
 		</div>
-		<div class="w3-row">
-			<div class="w3-card w3-third">
-				<header class="w3-container">
-					<h3>Store</h3>
-					<div class="w3-container"> <p> some info</p></div>
-					<footer class="w3-container"><h5>footer </h5></footer>
-			</div>
-			<div class="w3-card w3-third">
-				<header class="w3-container">
-					<h3>Store</h3>
-					<div class="w3-container"> <p> some info</p></div>
-					<footer class="w3-container"><h5>footer </h5></footer>
-			</div>
-			<div class="w3-card w3-third">
-				<header class="w3-container">
-					<h3>Store</h3>
-					<div class="w3-container"> <p> some info</p></div>
-					<footer class="w3-container"><h5>footer </h5></footer>
+		<div class="swiper-container">
+			<div class="swiper-wrapper">
+				<!--<div class="w3-row swiper-slide">
+					<div class="w3-card w3-third ">
+						<header class="w3-container">
+							<h3>VanityName</h3>
+						</header>
+						<div class="w3-container"> <p>address</p></div>
+						<footer class="w3-container"><h5><button data-division="" data-storenumber="" class="w3-button w3-ripple w3-center"> add store</button>  </h5></footer>
+					</div>
+					<div class="w3-card w3-third ">
+						<header class="w3-container">
+							<h3>Store1a</h3>
+						</header>
+						<div class="w3-container"> <p> some info</p></div>
+						<footer class="w3-container"><h5>footer </h5></footer>
+					</div>
+					<div class="w3-card w3-third ">
+						<header class="w3-container">
+							<h3>Store1b</h3>
+						</header>
+						<div class="w3-container"> <p> some info</p></div>
+						<footer class="w3-container"><h5>footer </h5></footer>
+					</div>
+				</div>
+				<div class="w3-row swiper-slide">
+					<div class="w3-card w3-third ">
+						<header class="w3-container">
+							<h3>Store2</h3>
+						</header>
+						<div class="w3-container"> <p> some info</p></div>
+						<footer class="w3-container"><h5>footer </h5></footer>
+					</div>
+					<div class="w3-card w3-third ">
+						<header class="w3-container">
+							<h3>Store2a</h3>
+						</header>
+						<div class="w3-container"> <p> some info</p></div>
+						<footer class="w3-container"><h5>footer </h5></footer>
+					</div>
+					<div class="w3-card w3-third ">
+						<header class="w3-container">
+							<h3>Store2b</h3>
+						</header>
+						<div class="w3-container"> <p> some info</p></div>
+						<footer class="w3-container"><h5>footer </h5></footer>
+					</div>
+				</div>
+				<div class="w3-row swiper-slide">
+					<div class="w3-card w3-third ">
+						<header class="w3-container">
+							<h3>Store3</h3>
+						</header>
+						<div class="w3-container"> <p> some info</p></div>
+						<footer class="w3-container"><h5>footer </h5></footer>
+					</div>
+					<div class="w3-card w3-third ">
+						<header class="w3-container">
+							<h3>Store3a</h3>
+						</header>
+						<div class="w3-container"> <p> some info</p></div>
+						<footer class="w3-container"><h5>footer </h5></footer>
+					</div>
+					<div class="w3-card w3-third ">
+						<header class="w3-container">
+							<h3>Store3b</h3>
+						</header>
+						<div class="w3-container"> <p> some info</p></div>
+						<footer class="w3-container"><h5>footer </h5></footer>
+					</div>
+				</div>-->
 			</div>
 		</div>
+
+		<!--<div class="w3-row">
+			<div class="w3-card w3-third">
+				<header class="w3-container">
+					<h3>Store</h3>
+				</header>
+					<div class="w3-container"> <p> some info</p></div>
+					<footer class="w3-container"><h5>footer </h5></footer>
+			</div>
+			<div class="w3-card w3-third">
+				<header class="w3-container">
+					<h3>Store</h3>
+				</header>
+					<div class="w3-container"> <p> some info</p></div>
+					<footer class="w3-container"><h5>footer </h5></footer>
+			</div>
+			<div class="w3-card w3-third">
+				<header class="w3-container">
+					<h3>Store</h3>
+				</header>
+					<div class="w3-container"> <p> some info</p></div>
+					<footer class="w3-container"><h5>footer </h5></footer>
+			</div>
+		</div>-->
 		<!-- </div> -->
 	</div>
+	<div class="w3-hide">asdf</div>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.3.5/js/swiper.min.js"></script>
 	<script>
 		$(readyFn);
 		function readyFn() {
 			$("#searchStoreInput").keypress(searchStoreFn);
-			$("#searchGo").click(searchStoreGoFn);
+			$("#searchStoreGo").click(searchStoreGoFn);
+
+
+
+			var mySwiper = new Swiper('.swiper-container', {
+				// Optional parameters
+				//init: false,
+				direction: 'horizontal',
+				loop: true,
+				grabCursor: true,
+				// If we need pagination
+				pagination: {
+					el: '.swiper-pagination',
+				},
+				slidesPerView: 1,
+				// Navigation arrows
+				navigation: {
+					nextEl: '.swiper-button-next',
+					prevEl: '.swiper-button-prev',
+				},
+
+				// And if we need scrollbar
+				scrollbar: {
+					el: '.swiper-scrollbar',
+				},
+			});
+
+
+			if (true) {
+				
+				$.ajax = ajax_response(mockStoreData);
+			}
+
+
+
 
 		}
 		function searchStoreFn(e) {
@@ -68,12 +182,12 @@
 		function searchStoreGoFn(e) {
 			//TODO: disable the search button and turn off enter listener
 
-
+			
 			var searchTxt = $('#searchStoreInput');
 			if (searchTxt.val() === undefined || searchTxt.val() === '')
 				return false;
 
-			client.storeSearch(searchTxt.val());
+			apiClient.storeSearch(searchTxt.val());
 		}
 
 
@@ -86,19 +200,529 @@
 			console.log(client);
 			console.log("asdf");
 			client.storeSearch = function (searchText) {
-				$.ajax({
+				console.log('search');
+				if (mock) {
+					displayEngine.displayStores(mockStoreData);
+				}
+				else {
+					$.ajax({
 
-				}).done(displayEngine.displayStores);
+					}).done(displayEngine.displayStores);
+				}
 			};
 
 			return client;
 		})(function () { });
 
 		var displayEngine = (function (engine) {
-			engine.diplayStores = function (storeData) {
+			engine.displayStores = function (storeData) {
+				console.log('display');
+				if (storeData === undefined) { storeData = mockStoreData; }
+				let stores = storeData.Stores;
+				$.each(stores, function (index, store) {
+					let storeContainer = "";
+				});
+
+				
+
 			};
 			return engine;
 		})(function () { });
+
+
+
+
+		function ajax_response(response) {
+			return function (params) {
+				params.success(response);
+			};
+		}
+		var mock = true;
+		var mockStoreData = {
+			Stores: [
+				{
+					"banner": "KWIKSHOP",
+					"vanityName": "Kwik Shop",
+					"divisionNumber": "672",
+					"storeNumber": "00782",
+					"phoneNumber": "9137823856",
+					"showWeeklyAd": false,
+					"showShopThisStoreAndPreferredStoreButtons": false,
+					"distance": 16.623327255249023,
+					"latitude": "38.944175",
+					"longitude": "-94.815236",
+					"address": {
+						"addressLine1": "10111 Woodland Road",
+						"addressLine2": null,
+						"city": "Lenexa",
+						"countryCode": "US",
+						"stateCode": "KS",
+						"zip": "66220"
+					},
+					"pharmacy": null,
+					"departments": [{
+						"code": "55"
+					}, {
+						"code": "44"
+					}, {
+						"code": "95"
+					}, {
+						"code": "10"
+					}, {
+						"code": "9999"
+					}, {
+						"code": "78"
+					}, {
+						"code": "86"
+					}, {
+						"code": "60"
+					}, {
+						"code": "89"
+					}
+					],
+					"fulfillmentMethods": {
+						"hasPickup": false,
+						"hasDelivery": false
+					}
+				}, {
+					"banner": "DILLONS",
+					"vanityName": "Leavenworth Dillons",
+					"divisionNumber": "615",
+					"storeNumber": "00040",
+					"phoneNumber": "9132503500",
+					"showWeeklyAd": false,
+					"showShopThisStoreAndPreferredStoreButtons": false,
+					"distance": 21.322420120239258,
+					"latitude": "39.2679367",
+					"longitude": "-94.9200065",
+					"address": {
+						"addressLine1": "720 Eisenhower Rd",
+						"addressLine2": null,
+						"city": "Leavenworth",
+						"countryCode": "US",
+						"stateCode": "KS",
+						"zip": "66048"
+					},
+					"pharmacy": {
+						"phoneNumber": "9132503504"
+					},
+					"departments": [{
+						"code": "02"
+					}, {
+						"code": "44"
+					}, {
+						"code": "53"
+					}, {
+						"code": "99"
+					}, {
+						"code": "03"
+					}, {
+						"code": "31"
+					}, {
+						"code": "01"
+					}, {
+						"code": "95"
+					}, {
+						"code": "16"
+					}, {
+						"code": "23"
+					}, {
+						"code": "08"
+					}, {
+						"code": "10"
+					}, {
+						"code": "9999"
+					}, {
+						"code": "04"
+					}, {
+						"code": "65"
+					}, {
+						"code": "32"
+					}, {
+						"code": "50"
+					}, {
+						"code": "69"
+					}, {
+						"code": "09"
+					}, {
+						"code": "22"
+					}, {
+						"code": "60"
+					}, {
+						"code": "07"
+					}, {
+						"code": "30"
+					}, {
+						"code": "05"
+					}, {
+						"code": "21"
+					}, {
+						"code": "46"
+					}, {
+						"code": "89"
+					}
+					],
+					"fulfillmentMethods": {
+						"hasPickup": false,
+						"hasDelivery": false
+					}
+				}, {
+					"banner": "KWIKSHOP",
+					"vanityName": "Kwik Shop",
+					"divisionNumber": "672",
+					"storeNumber": "00783",
+					"phoneNumber": "7855423805",
+					"showWeeklyAd": false,
+					"showShopThisStoreAndPreferredStoreButtons": false,
+					"distance": 29.88580894470215,
+					"latitude": "38.933899",
+					"longitude": "-95.095308",
+					"address": {
+						"addressLine1": "1436 Church St",
+						"addressLine2": null,
+						"city": "Eudora",
+						"countryCode": "US",
+						"stateCode": "KS",
+						"zip": "66025"
+					},
+					"pharmacy": null,
+					"departments": [{
+						"code": "55"
+					}, {
+						"code": "44"
+					}, {
+						"code": "95"
+					}, {
+						"code": "10"
+					}, {
+						"code": "9999"
+					}, {
+						"code": "86"
+					}, {
+						"code": "60"
+					}, {
+						"code": "90"
+					}, {
+						"code": "89"
+					}
+					],
+					"fulfillmentMethods": {
+						"hasPickup": false,
+						"hasDelivery": false
+					}
+				}, {
+					"banner": "KWIKSHOP",
+					"vanityName": "Kwik Shop",
+					"divisionNumber": "672",
+					"storeNumber": "00785",
+					"phoneNumber": "7858431091",
+					"showWeeklyAd": false,
+					"showShopThisStoreAndPreferredStoreButtons": false,
+					"distance": 35.706424713134766,
+					"latitude": "38.9422",
+					"longitude": "-95.215125",
+					"address": {
+						"addressLine1": "1611 E 23Rd St",
+						"addressLine2": null,
+						"city": "Lawrence",
+						"countryCode": "US",
+						"stateCode": "KS",
+						"zip": "66046"
+					},
+					"pharmacy": null,
+					"departments": [{
+						"code": "55"
+					}, {
+						"code": "44"
+					}, {
+						"code": "95"
+					}, {
+						"code": "10"
+					}, {
+						"code": "9999"
+					}, {
+						"code": "86"
+					}, {
+						"code": "60"
+					}, {
+						"code": "90"
+					}, {
+						"code": "89"
+					}
+					],
+					"fulfillmentMethods": {
+						"hasPickup": false,
+						"hasDelivery": false
+					}
+				}, {
+					"banner": "DILLONS",
+					"vanityName": "Dapper Dillons",
+					"divisionNumber": "615",
+					"storeNumber": "00098",
+					"phoneNumber": "7858422942",
+					"showWeeklyAd": false,
+					"showShopThisStoreAndPreferredStoreButtons": false,
+					"distance": 36.53745651245117,
+					"latitude": "38.9518574",
+					"longitude": "-95.2352949",
+					"address": {
+						"addressLine1": "1740 Massachusetts Ave.",
+						"addressLine2": null,
+						"city": "Lawrence",
+						"countryCode": "US",
+						"stateCode": "KS",
+						"zip": "66044"
+					},
+					"pharmacy": {
+						"phoneNumber": "7858422434"
+					},
+					"departments": [{
+						"code": "55"
+					}, {
+						"code": "02"
+					}, {
+						"code": "17"
+					}, {
+						"code": "44"
+					}, {
+						"code": "53"
+					}, {
+						"code": "99"
+					}, {
+						"code": "03"
+					}, {
+						"code": "40"
+					}, {
+						"code": "31"
+					}, {
+						"code": "01"
+					}, {
+						"code": "16"
+					}, {
+						"code": "23"
+					}, {
+						"code": "29"
+					}, {
+						"code": "08"
+					}, {
+						"code": "58"
+					}, {
+						"code": "9999"
+					}, {
+						"code": "63"
+					}, {
+						"code": "26"
+					}, {
+						"code": "04"
+					}, {
+						"code": "65"
+					}, {
+						"code": "50"
+					}, {
+						"code": "69"
+					}, {
+						"code": "09"
+					}, {
+						"code": "60"
+					}, {
+						"code": "07"
+					}, {
+						"code": "30"
+					}, {
+						"code": "05"
+					}, {
+						"code": "21"
+					}, {
+						"code": "48"
+					}, {
+						"code": "46"
+					}, {
+						"code": "89"
+					}
+					],
+					"fulfillmentMethods": {
+						"hasPickup": false,
+						"hasDelivery": false
+					}
+				}, {
+					"banner": "KWIKSHOP",
+					"vanityName": "Kwik Shop",
+					"divisionNumber": "672",
+					"storeNumber": "00702",
+					"phoneNumber": "7858425536",
+					"showWeeklyAd": false,
+					"showShopThisStoreAndPreferredStoreButtons": false,
+					"distance": 36.566986083984375,
+					"latitude": "38.950411",
+					"longitude": "-95.235303",
+					"address": {
+						"addressLine1": "1846 Massachusetts St",
+						"addressLine2": null,
+						"city": "Lawrence",
+						"countryCode": "US",
+						"stateCode": "KS",
+						"zip": "66044"
+					},
+					"pharmacy": null,
+					"departments": [{
+						"code": "55"
+					}, {
+						"code": "44"
+					}, {
+						"code": "95"
+					}, {
+						"code": "10"
+					}, {
+						"code": "9999"
+					}, {
+						"code": "86"
+					}, {
+						"code": "60"
+					}, {
+						"code": "90"
+					}, {
+						"code": "89"
+					}
+					],
+					"fulfillmentMethods": {
+						"hasPickup": false,
+						"hasDelivery": false
+					}
+				}, {
+					"banner": "KWIKSHOP",
+					"vanityName": "Kwik Shop",
+					"divisionNumber": "672",
+					"storeNumber": "00721",
+					"phoneNumber": "7857491636",
+					"showWeeklyAd": false,
+					"showShopThisStoreAndPreferredStoreButtons": false,
+					"distance": 36.711238861083984,
+					"latitude": "38.967827",
+					"longitude": "-95.24452",
+					"address": {
+						"addressLine1": "845 Mississippi St",
+						"addressLine2": null,
+						"city": "Lawrence",
+						"countryCode": "US",
+						"stateCode": "KS",
+						"zip": "66044"
+					},
+					"pharmacy": null,
+					"departments": [{
+						"code": "55"
+					}, {
+						"code": "44"
+					}, {
+						"code": "10"
+					}, {
+						"code": "9999"
+					}, {
+						"code": "86"
+					}, {
+						"code": "89"
+					}
+					],
+					"fulfillmentMethods": {
+						"hasPickup": false,
+						"hasDelivery": false
+					}
+				}, {
+					"banner": "DILLONS",
+					"vanityName": "23rd St. Dillons",
+					"divisionNumber": "615",
+					"storeNumber": "00070",
+					"phoneNumber": "7858413366",
+					"showWeeklyAd": false,
+					"showShopThisStoreAndPreferredStoreButtons": false,
+					"distance": 37.41682434082031,
+					"latitude": "38.9420659",
+					"longitude": "-95.2485283",
+					"address": {
+						"addressLine1": "1015 W 23Rd St",
+						"addressLine2": null,
+						"city": "Lawrence",
+						"countryCode": "US",
+						"stateCode": "KS",
+						"zip": "66046"
+					},
+					"pharmacy": {
+						"phoneNumber": "7858415110"
+					},
+					"departments": [{
+						"code": "55"
+					}, {
+						"code": "02"
+					}, {
+						"code": "11"
+					}, {
+						"code": "44"
+					}, {
+						"code": "53"
+					}, {
+						"code": "99"
+					}, {
+						"code": "03"
+					}, {
+						"code": "54"
+					}, {
+						"code": "31"
+					}, {
+						"code": "01"
+					}, {
+						"code": "23"
+					}, {
+						"code": "73"
+					}, {
+						"code": "08"
+					}, {
+						"code": "9999"
+					}, {
+						"code": "63"
+					}, {
+						"code": "26"
+					}, {
+						"code": "04"
+					}, {
+						"code": "65"
+					}, {
+						"code": "32"
+					}, {
+						"code": "50"
+					}, {
+						"code": "69"
+					}, {
+						"code": "09"
+					}, {
+						"code": "22"
+					}, {
+						"code": "60"
+					}, {
+						"code": "07"
+					}, {
+						"code": "30"
+					}, {
+						"code": "05"
+					}, {
+						"code": "21"
+					}, {
+						"code": "48"
+					}, {
+						"code": "46"
+					}, {
+						"code": "89"
+					}
+					],
+					"fulfillmentMethods": {
+						"hasPickup": false,
+						"hasDelivery": false
+					}
+				}
+
+			]
+
+		}
+
+
 	</script>
 </body>
 </html>
