@@ -16,6 +16,9 @@
 		#searchStoreGo {
 			font-size: x-large;
 		}
+		.swiper-slide.w3-row{
+			padding-bottom: 37px;
+		}
 	</style>
 </head>
 <body>
@@ -31,77 +34,12 @@
 			<input class="w3-input w3-theme w3-border " name="zipcity" id="searchStoreInput" type="text" value="asdf">
 			<button class="w3-button w3-ripple w3-center fa fa-search w3-block w3-col" id="searchStoreGo"></button>
 		</div>
-		<div class="swiper-container">
+		<div id="storesSwiper" class="swiper-container">
+			<div class="swiper-pagination"></div>
+			<div class="swiper-button-prev"></div>
+			<div class="swiper-button-next"></div>
 			<div class="swiper-wrapper">
-				<!--<div class="w3-row swiper-slide">
-					<div class="w3-card w3-third ">
-						<header class="w3-container">
-							<h3>VanityName</h3>
-						</header>
-						<div class="w3-container"> <p>address</p></div>
-						<footer class="w3-container"><h5><button data-division="" data-storenumber="" class="w3-button w3-ripple w3-center"> add store</button>  </h5></footer>
-					</div>
-					<div class="w3-card w3-third ">
-						<header class="w3-container">
-							<h3>Store1a</h3>
-						</header>
-						<div class="w3-container"> <p> some info</p></div>
-						<footer class="w3-container"><h5>footer </h5></footer>
-					</div>
-					<div class="w3-card w3-third ">
-						<header class="w3-container">
-							<h3>Store1b</h3>
-						</header>
-						<div class="w3-container"> <p> some info</p></div>
-						<footer class="w3-container"><h5>footer </h5></footer>
-					</div>
-				</div>
-				<div class="w3-row swiper-slide">
-					<div class="w3-card w3-third ">
-						<header class="w3-container">
-							<h3>Store2</h3>
-						</header>
-						<div class="w3-container"> <p> some info</p></div>
-						<footer class="w3-container"><h5>footer </h5></footer>
-					</div>
-					<div class="w3-card w3-third ">
-						<header class="w3-container">
-							<h3>Store2a</h3>
-						</header>
-						<div class="w3-container"> <p> some info</p></div>
-						<footer class="w3-container"><h5>footer </h5></footer>
-					</div>
-					<div class="w3-card w3-third ">
-						<header class="w3-container">
-							<h3>Store2b</h3>
-						</header>
-						<div class="w3-container"> <p> some info</p></div>
-						<footer class="w3-container"><h5>footer </h5></footer>
-					</div>
-				</div>
-				<div class="w3-row swiper-slide">
-					<div class="w3-card w3-third ">
-						<header class="w3-container">
-							<h3>Store3</h3>
-						</header>
-						<div class="w3-container"> <p> some info</p></div>
-						<footer class="w3-container"><h5>footer </h5></footer>
-					</div>
-					<div class="w3-card w3-third ">
-						<header class="w3-container">
-							<h3>Store3a</h3>
-						</header>
-						<div class="w3-container"> <p> some info</p></div>
-						<footer class="w3-container"><h5>footer </h5></footer>
-					</div>
-					<div class="w3-card w3-third ">
-						<header class="w3-container">
-							<h3>Store3b</h3>
-						</header>
-						<div class="w3-container"> <p> some info</p></div>
-						<footer class="w3-container"><h5>footer </h5></footer>
-					</div>
-				</div>-->
+				
 			</div>
 		</div>
 
@@ -130,22 +68,34 @@
 		</div>-->
 		<!-- </div> -->
 	</div>
-	<div class="w3-hide">asdf</div>
+	<div class="w3-hide">
+		<div id="storeTemplate" class="w3-card w3-third ">
+			<header class="w3-container">
+				<h3>VanityName</h3>
+			</header>
+			<div class="w3-container"> <p>address</p> <p>distance</p></div>
+			<footer class="w3-container"><h5 class="w3-center"><button class="w3-button w3-ripple w3-center"> add store</button>  </h5></footer>
+			
+		</div>
+		<div id="storeWrapperTemplate" class="w3-row swiper-slide"></div>
+	</div>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.3.5/js/swiper.min.js"></script>
 	<script>
 		$(readyFn);
 		function readyFn() {
+			let payload = {stores: [], upcs: []};
 			$("#searchStoreInput").keypress(searchStoreFn);
 			$("#searchStoreGo").click(searchStoreGoFn);
 
-
+			$("#storesSwiper").on("click.addStore", "button", payload, addStore);
 
 			var mySwiper = new Swiper('.swiper-container', {
 				// Optional parameters
 				//init: false,
 				direction: 'horizontal',
 				loop: true,
+				
 				grabCursor: true,
 				// If we need pagination
 				pagination: {
@@ -157,11 +107,7 @@
 					nextEl: '.swiper-button-next',
 					prevEl: '.swiper-button-prev',
 				},
-
-				// And if we need scrollbar
-				scrollbar: {
-					el: '.swiper-scrollbar',
-				},
+			
 			});
 
 
@@ -190,6 +136,9 @@
 			apiClient.storeSearch(searchTxt.val());
 		}
 
+		function addStore(event) {
+			console.log(event);
+		}
 
 		function runStoreSearch(searchText) {
 
@@ -219,11 +168,38 @@
 				console.log('display');
 				if (storeData === undefined) { storeData = mockStoreData; }
 				let stores = storeData.Stores;
-				$.each(stores, function (index, store) {
-					let storeContainer = "";
-				});
+				let storeContainers = [];
 
-				
+				let storeTemplate = $("#storeTemplate");
+				let wrapper = undefined
+				let wrappers = [];
+				$.each(stores, function (index, store) {
+					if (index % 3 === 0) {
+						wrapper = $("#storeWrapperTemplate").clone();
+						wrapper.attr('id', null);
+						wrappers.push(wrapper);	
+					}
+					let clone = storeTemplate.clone();
+					clone.attr('id', null);
+					clone.find("h3")[0].innerText = store.vanityName;
+					let paragraphs = clone.find("p");
+					paragraphs[0].innerText =
+						store.address.addressLine1 + " " +
+						(!store.address.addressLine2 ? "" : store.address.addressLine2) + " " +
+						store.address.city + " " +
+						store.address.stateCode + " " +
+						store.address.zip;
+					paragraphs[1].innerText = store.distance + " mi."
+					let button = clone.find("button").eq(0);
+					button.attr('data-storenumber', store.storeNumber);
+					button.attr('data-divisionnumber', store.divisionNumber)
+					wrapper.append(clone);
+					
+				});
+				let s = document.querySelector('#storesSwiper').swiper;
+				s.removeAllSlides();
+				s.appendSlide(wrappers.map(function (w) { return w[0] }));
+				s.slideTo(1);			
 
 			};
 			return engine;
