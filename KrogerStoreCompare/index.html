@@ -242,6 +242,14 @@
 						let button = clone.find("button").eq(0);
 						button.attr('data-storenumber', store.storeNumber);
 						button.attr('data-divisionnumber', store.divisionNumber)
+						let storeObj = {
+							StoreId: store.storeNumber,
+							DivisionId: store.divisionNumber
+						};
+						if (indexOfStore(storeObj) > -1) {
+							button.text("remove store");
+						}
+
 						wrapper.append(clone);
 
 					});
