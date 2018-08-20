@@ -21,10 +21,12 @@ namespace KrogerStoreCompare.Endpoints
             KrogerClient krogerClient = Startup.KrogerClient;
             SearchAllRequest  searchAllRequest = JsonConvert.DeserializeObject<SearchAllRequest>(req.Content.ReadAsStringAsync().Result);
 
-            SearchAllResponse searchAllResponse= krogerClient.SearchAll(searchAllRequest);
+            SearchAllResponse searchAllResponse = krogerClient.SearchAll(searchAllRequest);
+
+            ProductsDetailsResponse productsDetailsResponse =  krogerClient.ProductsDetails(new ProductsDetailsRequest() { UPCs = searchAllResponse.Upcs });
             
             return req.CreateResponse(HttpStatusCode.OK, 
-                new { searchAllResponse.ProductsInfo, searchAllResponse.Upcs }
+                new { productsDetailsResponse.Products}
                 );
         }
     }

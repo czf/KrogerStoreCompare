@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-	<title></title>
+	<title>Price Comparison</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
@@ -13,11 +13,14 @@
 			outline: none;
 		}
 
-		#searchStoreGo {
+		button.fa-search {
 			font-size: x-large;
 		}
 		.swiper-slide.w3-row{
 			padding-bottom: 37px;
+		}
+		#productsSwiper .w3-card{
+			padding-top:4px;
 		}
 	</style>
 </head>
@@ -35,6 +38,19 @@
 			<button class="w3-button w3-ripple w3-center fa fa-search w3-block w3-col" id="searchStoreGo"></button>
 		</div>
 		<div id="storesSwiper" class="swiper-container">
+			<div class="swiper-pagination"></div>
+			<div class="swiper-button-prev"></div>
+			<div class="swiper-button-next"></div>
+			<div class="swiper-wrapper"></div>
+		</div>
+
+
+
+		<div class="w3-row w3-hide">
+			<input class="w3-input w3-theme w3-border " name="product" id="searchProductInput" type="text" value="product">
+			<button class="w3-button w3-ripple w3-center fa fa-search w3-block w3-col" id="searchProductGo"></button>
+		</div>
+		<div id="productsSwiper" class="swiper-container">
 			<div class="swiper-pagination"></div>
 			<div class="swiper-button-prev"></div>
 			<div class="swiper-button-next"></div>
@@ -66,16 +82,36 @@
 		</div>-->
 		<!-- </div> -->
 	</div>
+	<div style="height:525px;"></div>
 	<div class="w3-hide">
 		<div id="storeTemplate" class="w3-card w3-third ">
 			<header class="w3-container">
 				<h3>VanityName</h3>
 			</header>
 			<div class="w3-container"> <p>address</p> <p>distance</p></div>
-			<footer class="w3-container"><h5 class="w3-center"><button class="w3-button w3-ripple w3-center"> add store</button>  </h5></footer>
+			<footer class="w3-container"><h5 class="w3-center"><button class="w3-button w3-ripple w3-center">add store</button>  </h5></footer>
 
 		</div>
 		<div id="storeWrapperTemplate" class="w3-row swiper-slide"></div>
+		<div id="productTemplate" class="w3-card w3-third w3-center">
+			<div class="w3-container ">
+				<picture>
+					<source media="(min-width:601px)"/>
+					<source media="(max-width:600px)"/>
+					<img />
+				</picture>
+			</div>
+			<div class="w3-container">
+
+			</div>
+			<div class="w3-container">
+
+			</div>
+			<footer class="w3-container">
+				<h5 class="w3-center"><button class="w3-button w3-ripple w3-center">add product</button> </h5>
+			</footer>
+		</div>
+		<div id="productWrapperTemplate" class="w3-row swiper-slide"></div>
 	</div>
 	<div id="storeLimit" class="w3-modal">
 		<div class="w3-modal-content">
@@ -87,6 +123,16 @@
 			</div>
 		</div>
 	</div>
+	<div id="productLimit" class="w3-modal">
+		<div class="w3-modal-content">
+			<div class="w3-container">
+				<span onclick="document.getElementById('productLimit').style.display='none'"
+					  class="w3-button w3-display-topright">&times;</span>
+				<p>You've reached the limit of products for comparison. </p>
+				<p>You'll need to remove a product before another can be added. </p>
+			</div>
+		</div>
+	</div>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.3.5/js/swiper.min.js"></script>
 	<script>
@@ -95,8 +141,11 @@
 			const MAX_STORES = 2;
 			let storeKeypress = "keypress.storeInput";
 			let storeClick = "click.storeGo";
+			let productKeypress = "keypress.productSearchInput";
+			let productSearchClick = "click.productSearchGo";
 			let payload = { stores: [], upcs: [] };
 			addStoreSearchBindings();
+			addProductSearchBindings();
 
 			$("#storesSwiper").on("click.storeBtn", "button", payload, storeBtn);
 
@@ -120,10 +169,25 @@
 
 			});
 
+			document.addEventListener('storeAdded', storeAddedHandler);
+			document.addEventListener('productAdded', productAddedHandler);
+
 
 			if (true) {
 
 				$.ajax = ajax_response(mockStoreData);
+			}
+
+			function storeAddedHandler(e) {
+				if (payload.stores.length === MAX_STORES) {
+					$("#searchProductInput").parent().removeClass('w3-hide');
+
+				}
+			}
+
+			function addStoreSearchBindings() {
+				$("#searchStoreInput").on(storeKeypress, searchStoreFn);
+				$("#searchStoreGo").on(storeClick, searchStoreGoFn).attr("disabled", null);
 			}
 
 			function searchStoreFn(e) {
@@ -135,13 +199,7 @@
 
 			}
 
-			function addStoreSearchBindings() {
-				$("#searchStoreInput").on(storeKeypress, searchStoreFn);
-				$("#searchStoreGo").on(storeClick, searchStoreGoFn).attr("disabled", null);
-			}
-
 			function searchStoreGoFn(e) {
-				//TODO: disable the search button and turn OFF click listener
 				$("#searchStoreInput").off(storeKeypress);
 				$("#searchStoreGo").off(storeClick).attr("disabled", "");
 
@@ -151,9 +209,52 @@
 					return false;
 
 				apiClient.storeSearch(searchTxt.val()).always(addStoreSearchBindings);
-
-				//TODO: ENABLE the search button and turn ON click listener
 			}
+
+
+
+
+			function productAddedHandler(e) {
+				if (payload.products.length === MAX_PRODUCTS) {
+					$("#searchProductInput").parent().removeClass('w3-hide');
+
+				}
+			}
+
+			function addProductSearchBindings() {
+				$("#searchProductInput").on(productKeypress, searchProductFn);
+				$("#searchProductGo").on(productSearchClick, searchProductGoFn).attr("disabled", null);
+			}
+
+			function searchProductFn(e) {
+				//If enter is pressed post a search store request.
+				// Number 13 is the "Enter" key on the keyboard
+				if (event.keyCode === 13) {
+					searchProductGoFn(e);
+				}
+
+			}
+
+			function searchProductGoFn(e) {
+				$("#searchProductInput").off(productKeypress);
+				$("#searchProductGo").off(productSearchClick).attr("disabled", "");
+
+
+				var searchTxt = $('#searchProductInput');
+				if (searchTxt.val() === undefined || searchTxt.val() === '')
+					return false;
+
+				apiClient.productSearch(searchTxt.val()).always(addProductSearchBindings);
+			}
+
+
+
+
+
+
+
+
+
 
 			function storeBtn(event) {
 				let btn = $(event.target);
@@ -172,7 +273,7 @@
 				else {
 					payload.stores.push(storeObj);
 					btn.text("remove store");
-
+					document.dispatchEvent(new Event('storeAdded'));
 				}
 			}
 
@@ -204,7 +305,21 @@
 					else {
 						$.ajax({
 
-						}).done(function () { displayEngine.displayStores(); dfd.resolve(); });
+						}).done(function (storeData) { displayEngine.displayStores(storeData); dfd.resolve(); });
+					}
+					return dfd.promise();
+				};
+
+				client.productSearch = function (searchText) {
+					let dfd = $.Deferred();
+					console.log('product search');
+					if (mock) {
+						displayEngine.displayProductSearchResults(mockProductSearchData);
+						dfd.resolve();
+					} else {
+						$.ajax({
+
+						}).done(function (productData) { displayEngine.displayProductSearchResults(productData); dfd.resolve(); });
 					}
 					return dfd.promise();
 				};
@@ -259,10 +374,68 @@
 					s.slideTo(1);
 
 				};
+
+				engine.displayProductSearchResults = function (productData) {
+					console.log('display');
+					if (productData === undefined) { productData = mockproductData; }
+					let products = productData.Products;
+					let productContainers = [];
+
+					let productTemplate = $("#productTemplate");
+					let wrapper = undefined
+					let wrappers = [];
+
+					$.each(products, function (index, product) {
+						if (index % 3 === 0) {
+							wrapper = $("#productWrapperTemplate").clone();
+							wrapper.attr('id', null);
+							wrappers.push(wrapper);
+						}
+						let clone = productTemplate.clone();
+						clone.attr('id', null);
+						clone.find("img")[0].src = product.mainImage;
+						let smallImgIndx = indexOfSmallImage(product);
+						let smallImage = undefined;
+						if (smallImgIndx === -1) { smallImage = product.mainImage; }
+						else { smallImage = product.images[smallImgIndx].url; }
+
+						let sources = clone.find("source");
+						sources[0].srcset = product.mainImage;
+						sources[1].srcset = smallImage
+						let containers = clone.find("div.w3-container");
+						containers[1].innerText = product.description;
+							
+						containers[2].innerText = product.customerFacingSize;
+						let button = clone.find("button").eq(0);
+						button.attr('data-upc', product.upc);
+						
+						if (Object.keys(payload.upcs).indexOf(product.upc) > -1) {
+							button.text("remove product");
+						}
+
+						wrapper.append(clone);
+
+					});
+
+					let s = document.querySelector('#productsSwiper').swiper;
+					s.removeAllSlides();
+					s.appendSlide(wrappers.map(function (w) { return w[0] }));
+					s.slideTo(1);
+
+
+
+				}
+
 				return engine;
 			})(function () { });
 
-
+			function indexOfSmallImage(product) {
+				return (product.images.findIndex(
+					function (image) {
+						return image.size === 'small' && image.perspective === 'front';
+					}
+				));
+			}
 
 
 			function ajax_response(response) {
@@ -752,8 +925,750 @@
 					}
 
 				]
-
 			}
+			var mockProductSearchData =
+			{
+				Products: [{
+					"brandName": "Campbell's",
+					"clickListItem": false,
+					"countryOfOrigin": null,
+					"customerFacingSize": "10.75 oz",
+					"description": "Campbell's Cream of Chicken Soup",
+					"forceSize": null,
+					"homeDeliveryItem": false,
+					"images": [{
+						"url": "https://www.kroger.com/product/images/medium/front/0005100001031",
+						"perspective": "front",
+						"size": "medium"
+					}, {
+						"url": "https://www.kroger.com/product/images/small/front/0005100001031",
+						"perspective": "front",
+						"size": "small"
+					}, {
+						"url": "https://www.kroger.com/product/images/large/front/0005100001031",
+						"perspective": "front",
+						"size": "large"
+					}, {
+						"url": "https://www.kroger.com/product/images/xlarge/front/0005100001031",
+						"perspective": "front",
+						"size": "xlarge"
+					}, {
+						"url": "https://www.kroger.com/product/images/thumbnail/front/0005100001031",
+						"perspective": "front",
+						"size": "thumbnail"
+					}
+					],
+					"mainImagePerspective": "front",
+					"multipackItem": false,
+					"multipackQuantity": "0",
+					"options": [],
+					"romanceDescription": null,
+					"seoDescription": "campbell-s-cream-of-chicken-soup",
+					"serviceCounter": null,
+					"shipToHomeItem": false,
+					"soldInStore": false,
+					"temperatureIndicator": "Ambient",
+					"verified": true,
+					"mainImage": "https://www.kroger.com/product/images/medium/front/0005100001031",
+					"slug": "campbell-s-cream-of-chicken-soup",
+					"categories": [{
+						"name": "Canned & Packaged",
+						"code": "12",
+						"categoryCode": "12",
+						"categoryName": "Canned & Packaged",
+						"category": "Canned & Packaged"
+					}
+					],
+					"calculatedPromoPrice": null,
+					"calculatedRegularPrice": null,
+					"calculatedReferencePrice": null,
+					"displayTemplate": null,
+					"division": null,
+					"minimumAdvertisedPrice": null,
+					"orderBy": null,
+					"regularNFor": null,
+					"referenceNFor": null,
+					"referencePrice": null,
+					"store": null,
+					"endDate": null,
+					"priceNormal": null,
+					"priceSale": null,
+					"promoDescription": null,
+					"promoType": null,
+					"soldBy": null,
+					"promoNfor": null,
+					"complementProductIds": null,
+					"upc": "0005100001031",
+					"couponId": null,
+					"offers": [],
+					"couponIds": [],
+					"monetizationInfo": null,
+					"hasPrice": false,
+					"loyalMember": false,
+					"primaryIndex": 1,
+					"curbsidePickupEligible": false
+				}, {
+					"brandName": "Campbell's",
+					"clickListItem": false,
+					"countryOfOrigin": null,
+					"customerFacingSize": "10.5 oz",
+					"description": "Campbell's 99% Fat Free Cream of Chicken Soup",
+					"forceSize": null,
+					"homeDeliveryItem": false,
+					"images": [{
+						"url": "https://www.kroger.com/product/images/thumbnail/front/0005100011553",
+						"perspective": "front",
+						"size": "thumbnail"
+					}, {
+						"url": "https://www.kroger.com/product/images/small/front/0005100011553",
+						"perspective": "front",
+						"size": "small"
+					}, {
+						"url": "https://www.kroger.com/product/images/xlarge/front/0005100011553",
+						"perspective": "front",
+						"size": "xlarge"
+					}, {
+						"url": "https://www.kroger.com/product/images/large/front/0005100011553",
+						"perspective": "front",
+						"size": "large"
+					}, {
+						"url": "https://www.kroger.com/product/images/thumbnail/back/0005100011553",
+						"perspective": "back",
+						"size": "thumbnail"
+					}, {
+						"url": "https://www.kroger.com/product/images/medium/front/0005100011553",
+						"perspective": "front",
+						"size": "medium"
+					}, {
+						"url": "https://www.kroger.com/product/images/medium/left/0005100011553",
+						"perspective": "left",
+						"size": "medium"
+					}, {
+						"url": "https://www.kroger.com/product/images/small/back/0005100011553",
+						"perspective": "back",
+						"size": "small"
+					}, {
+						"url": "https://www.kroger.com/product/images/large/left/0005100011553",
+						"perspective": "left",
+						"size": "large"
+					}, {
+						"url": "https://www.kroger.com/product/images/medium/back/0005100011553",
+						"perspective": "back",
+						"size": "medium"
+					}, {
+						"url": "https://www.kroger.com/product/images/large/back/0005100011553",
+						"perspective": "back",
+						"size": "large"
+					}, {
+						"url": "https://www.kroger.com/product/images/xlarge/back/0005100011553",
+						"perspective": "back",
+						"size": "xlarge"
+					}, {
+						"url": "https://www.kroger.com/product/images/xlarge/left/0005100011553",
+						"perspective": "left",
+						"size": "xlarge"
+					}, {
+						"url": "https://www.kroger.com/product/images/small/left/0005100011553",
+						"perspective": "left",
+						"size": "small"
+					}, {
+						"url": "https://www.kroger.com/product/images/thumbnail/left/0005100011553",
+						"perspective": "left",
+						"size": "thumbnail"
+					}
+					],
+					"mainImagePerspective": "front",
+					"multipackItem": false,
+					"multipackQuantity": "0",
+					"options": [],
+					"romanceDescription": null,
+					"seoDescription": "campbell-s-99-fat-free-cream-of-chicken-soup",
+					"serviceCounter": null,
+					"shipToHomeItem": false,
+					"soldInStore": false,
+					"temperatureIndicator": "Ambient",
+					"verified": true,
+					"mainImage": "https://www.kroger.com/product/images/medium/front/0005100011553",
+					"slug": "campbell-s-99-fat-free-cream-of-chicken-soup",
+					"categories": [{
+						"name": "Canned & Packaged",
+						"code": "12",
+						"categoryCode": "12",
+						"categoryName": "Canned & Packaged",
+						"category": "Canned & Packaged"
+					}
+					],
+					"calculatedPromoPrice": null,
+					"calculatedRegularPrice": null,
+					"calculatedReferencePrice": null,
+					"displayTemplate": null,
+					"division": null,
+					"minimumAdvertisedPrice": null,
+					"orderBy": null,
+					"regularNFor": null,
+					"referenceNFor": null,
+					"referencePrice": null,
+					"store": null,
+					"endDate": null,
+					"priceNormal": null,
+					"priceSale": null,
+					"promoDescription": null,
+					"promoType": null,
+					"soldBy": null,
+					"promoNfor": null,
+					"complementProductIds": null,
+					"upc": "0005100011553",
+					"couponId": null,
+					"offers": [],
+					"couponIds": [],
+					"monetizationInfo": null,
+					"hasPrice": false,
+					"loyalMember": false,
+					"primaryIndex": 2,
+					"curbsidePickupEligible": false
+				}, {
+					"brandName": "Kroger",
+					"clickListItem": false,
+					"countryOfOrigin": null,
+					"customerFacingSize": "10.5 oz",
+					"description": "Kroger Cream of Chicken Soup - Reduced Sodium",
+					"forceSize": null,
+					"homeDeliveryItem": false,
+					"images": [{
+						"url": "https://www.kroger.com/product/images/xlarge/front/0001111087191",
+						"perspective": "front",
+						"size": "xlarge"
+					}, {
+						"url": "https://www.kroger.com/product/images/medium/front/0001111087191",
+						"perspective": "front",
+						"size": "medium"
+					}, {
+						"url": "https://www.kroger.com/product/images/small/front/0001111087191",
+						"perspective": "front",
+						"size": "small"
+					}, {
+						"url": "https://www.kroger.com/product/images/thumbnail/front/0001111087191",
+						"perspective": "front",
+						"size": "thumbnail"
+					}, {
+						"url": "https://www.kroger.com/product/images/large/front/0001111087191",
+						"perspective": "front",
+						"size": "large"
+					}
+					],
+					"mainImagePerspective": "front",
+					"multipackItem": false,
+					"multipackQuantity": "0",
+					"options": [],
+					"romanceDescription": null,
+					"seoDescription": "kroger-cream-of-chicken-soup-reduced-sodium",
+					"serviceCounter": null,
+					"shipToHomeItem": false,
+					"soldInStore": false,
+					"temperatureIndicator": "Ambient",
+					"verified": true,
+					"mainImage": "https://www.kroger.com/product/images/medium/front/0001111087191",
+					"slug": "kroger-cream-of-chicken-soup-reduced-sodium",
+					"categories": [{
+						"name": "Canned & Packaged",
+						"code": "12",
+						"categoryCode": "12",
+						"categoryName": "Canned & Packaged",
+						"category": "Canned & Packaged"
+					}
+					],
+					"calculatedPromoPrice": null,
+					"calculatedRegularPrice": null,
+					"calculatedReferencePrice": null,
+					"displayTemplate": null,
+					"division": null,
+					"minimumAdvertisedPrice": null,
+					"orderBy": null,
+					"regularNFor": null,
+					"referenceNFor": null,
+					"referencePrice": null,
+					"store": null,
+					"endDate": null,
+					"priceNormal": null,
+					"priceSale": null,
+					"promoDescription": null,
+					"promoType": null,
+					"soldBy": null,
+					"promoNfor": null,
+					"complementProductIds": null,
+					"upc": "0001111087191",
+					"couponId": null,
+					"offers": [],
+					"couponIds": [],
+					"monetizationInfo": null,
+					"hasPrice": false,
+					"loyalMember": false,
+					"primaryIndex": 3,
+					"curbsidePickupEligible": false
+				}, {
+					"brandName": "Campbell's",
+					"clickListItem": false,
+					"countryOfOrigin": null,
+					"customerFacingSize": "26 oz",
+					"description": "Campbell's Family Size Condensed Cream of Chicken Soup",
+					"forceSize": null,
+					"homeDeliveryItem": false,
+					"images": [{
+						"url": "https://www.kroger.com/product/images/small/left/0005100021243",
+						"perspective": "left",
+						"size": "small"
+					}, {
+						"url": "https://www.kroger.com/product/images/thumbnail/right/0005100021243",
+						"perspective": "right",
+						"size": "thumbnail"
+					}, {
+						"url": "https://www.kroger.com/product/images/medium/front/0005100021243",
+						"perspective": "front",
+						"size": "medium"
+					}, {
+						"url": "https://www.kroger.com/product/images/thumbnail/back/0005100021243",
+						"perspective": "back",
+						"size": "thumbnail"
+					}, {
+						"url": "https://www.kroger.com/product/images/xlarge/back/0005100021243",
+						"perspective": "back",
+						"size": "xlarge"
+					}, {
+						"url": "https://www.kroger.com/product/images/large/right/0005100021243",
+						"perspective": "right",
+						"size": "large"
+					}, {
+						"url": "https://www.kroger.com/product/images/small/front/0005100021243",
+						"perspective": "front",
+						"size": "small"
+					}, {
+						"url": "https://www.kroger.com/product/images/medium/back/0005100021243",
+						"perspective": "back",
+						"size": "medium"
+					}, {
+						"url": "https://www.kroger.com/product/images/large/front/0005100021243",
+						"perspective": "front",
+						"size": "large"
+					}, {
+						"url": "https://www.kroger.com/product/images/large/back/0005100021243",
+						"perspective": "back",
+						"size": "large"
+					}, {
+						"url": "https://www.kroger.com/product/images/medium/right/0005100021243",
+						"perspective": "right",
+						"size": "medium"
+					}, {
+						"url": "https://www.kroger.com/product/images/small/right/0005100021243",
+						"perspective": "right",
+						"size": "small"
+					}, {
+						"url": "https://www.kroger.com/product/images/small/back/0005100021243",
+						"perspective": "back",
+						"size": "small"
+					}, {
+						"url": "https://www.kroger.com/product/images/thumbnail/front/0005100021243",
+						"perspective": "front",
+						"size": "thumbnail"
+					}, {
+						"url": "https://www.kroger.com/product/images/xlarge/left/0005100021243",
+						"perspective": "left",
+						"size": "xlarge"
+					}, {
+						"url": "https://www.kroger.com/product/images/large/left/0005100021243",
+						"perspective": "left",
+						"size": "large"
+					}, {
+						"url": "https://www.kroger.com/product/images/medium/left/0005100021243",
+						"perspective": "left",
+						"size": "medium"
+					}, {
+						"url": "https://www.kroger.com/product/images/thumbnail/left/0005100021243",
+						"perspective": "left",
+						"size": "thumbnail"
+					}, {
+						"url": "https://www.kroger.com/product/images/xlarge/front/0005100021243",
+						"perspective": "front",
+						"size": "xlarge"
+					}, {
+						"url": "https://www.kroger.com/product/images/xlarge/right/0005100021243",
+						"perspective": "right",
+						"size": "xlarge"
+					}
+					],
+					"mainImagePerspective": "front",
+					"multipackItem": false,
+					"multipackQuantity": "0",
+					"options": [],
+					"romanceDescription": null,
+					"seoDescription": "campbell-s-family-size-condensed-cream-of-chicken-soup",
+					"serviceCounter": null,
+					"shipToHomeItem": false,
+					"soldInStore": false,
+					"temperatureIndicator": "Ambient",
+					"verified": true,
+					"mainImage": "https://www.kroger.com/product/images/medium/front/0005100021243",
+					"slug": "campbell-s-family-size-condensed-cream-of-chicken-soup",
+					"categories": [{
+						"name": "Canned & Packaged",
+						"code": "12",
+						"categoryCode": "12",
+						"categoryName": "Canned & Packaged",
+						"category": "Canned & Packaged"
+					}
+					],
+					"calculatedPromoPrice": null,
+					"calculatedRegularPrice": null,
+					"calculatedReferencePrice": null,
+					"displayTemplate": null,
+					"division": null,
+					"minimumAdvertisedPrice": null,
+					"orderBy": null,
+					"regularNFor": null,
+					"referenceNFor": null,
+					"referencePrice": null,
+					"store": null,
+					"endDate": null,
+					"priceNormal": null,
+					"priceSale": null,
+					"promoDescription": null,
+					"promoType": null,
+					"soldBy": null,
+					"promoNfor": null,
+					"complementProductIds": null,
+					"upc": "0005100021243",
+					"couponId": null,
+					"offers": [],
+					"couponIds": [],
+					"monetizationInfo": null,
+					"hasPrice": false,
+					"loyalMember": false,
+					"primaryIndex": 4,
+					"curbsidePickupEligible": false
+				}, {
+					"brandName": "Simple Truth Organic",
+					"clickListItem": false,
+					"countryOfOrigin": null,
+					"customerFacingSize": "10.5 oz",
+					"description": "Simple Truth Organic Cream of Chicken Soup",
+					"forceSize": null,
+					"homeDeliveryItem": false,
+					"images": [{
+						"url": "https://www.kroger.com/product/images/medium/front/0001111088973",
+						"perspective": "front",
+						"size": "medium"
+					}, {
+						"url": "https://www.kroger.com/product/images/xlarge/front/0001111088973",
+						"perspective": "front",
+						"size": "xlarge"
+					}, {
+						"url": "https://www.kroger.com/product/images/small/front/0001111088973",
+						"perspective": "front",
+						"size": "small"
+					}, {
+						"url": "https://www.kroger.com/product/images/large/front/0001111088973",
+						"perspective": "front",
+						"size": "large"
+					}, {
+						"url": "https://www.kroger.com/product/images/thumbnail/front/0001111088973",
+						"perspective": "front",
+						"size": "thumbnail"
+					}
+					],
+					"mainImagePerspective": "front",
+					"multipackItem": false,
+					"multipackQuantity": "0",
+					"options": [],
+					"romanceDescription": null,
+					"seoDescription": "simple-truth-organic-cream-of-chicken-soup",
+					"serviceCounter": null,
+					"shipToHomeItem": false,
+					"soldInStore": false,
+					"temperatureIndicator": "Ambient",
+					"verified": true,
+					"mainImage": "https://www.kroger.com/product/images/medium/front/0001111088973",
+					"slug": "simple-truth-organic-cream-of-chicken-soup",
+					"categories": [{
+						"name": "Natural & Organic",
+						"code": "73",
+						"categoryCode": "73",
+						"categoryName": "Natural & Organic",
+						"category": "Natural & Organic"
+					}, {
+						"name": "Canned & Packaged",
+						"code": "12",
+						"categoryCode": "12",
+						"categoryName": "Canned & Packaged",
+						"category": "Canned & Packaged"
+					}
+					],
+					"calculatedPromoPrice": null,
+					"calculatedRegularPrice": null,
+					"calculatedReferencePrice": null,
+					"displayTemplate": null,
+					"division": null,
+					"minimumAdvertisedPrice": null,
+					"orderBy": null,
+					"regularNFor": null,
+					"referenceNFor": null,
+					"referencePrice": null,
+					"store": null,
+					"endDate": null,
+					"priceNormal": null,
+					"priceSale": null,
+					"promoDescription": null,
+					"promoType": null,
+					"soldBy": null,
+					"promoNfor": null,
+					"complementProductIds": null,
+					"upc": "0001111088973",
+					"couponId": null,
+					"offers": [],
+					"couponIds": [],
+					"monetizationInfo": null,
+					"hasPrice": false,
+					"loyalMember": false,
+					"primaryIndex": 5,
+					"curbsidePickupEligible": false
+				}, {
+					"brandName": "Campbell's",
+					"clickListItem": false,
+					"countryOfOrigin": null,
+					"customerFacingSize": "18.8 oz",
+					"description": "Campbell's Chunky Savory Chicken Soup With White & Wild Rice",
+					"forceSize": null,
+					"homeDeliveryItem": false,
+					"images": [{
+						"url": "https://www.kroger.com/product/images/thumbnail/left/0005100000562",
+						"perspective": "left",
+						"size": "thumbnail"
+					}, {
+						"url": "https://www.kroger.com/product/images/large/left/0005100000562",
+						"perspective": "left",
+						"size": "large"
+					}, {
+						"url": "https://www.kroger.com/product/images/medium/right/0005100000562",
+						"perspective": "right",
+						"size": "medium"
+					}, {
+						"url": "https://www.kroger.com/product/images/xlarge/right/0005100000562",
+						"perspective": "right",
+						"size": "xlarge"
+					}, {
+						"url": "https://www.kroger.com/product/images/thumbnail/front/0005100000562",
+						"perspective": "front",
+						"size": "thumbnail"
+					}, {
+						"url": "https://www.kroger.com/product/images/small/right/0005100000562",
+						"perspective": "right",
+						"size": "small"
+					}, {
+						"url": "https://www.kroger.com/product/images/thumbnail/right/0005100000562",
+						"perspective": "right",
+						"size": "thumbnail"
+					}, {
+						"url": "https://www.kroger.com/product/images/large/front/0005100000562",
+						"perspective": "front",
+						"size": "large"
+					}, {
+						"url": "https://www.kroger.com/product/images/medium/front/0005100000562",
+						"perspective": "front",
+						"size": "medium"
+					}, {
+						"url": "https://www.kroger.com/product/images/xlarge/left/0005100000562",
+						"perspective": "left",
+						"size": "xlarge"
+					}, {
+						"url": "https://www.kroger.com/product/images/medium/left/0005100000562",
+						"perspective": "left",
+						"size": "medium"
+					}, {
+						"url": "https://www.kroger.com/product/images/large/right/0005100000562",
+						"perspective": "right",
+						"size": "large"
+					}, {
+						"url": "https://www.kroger.com/product/images/small/front/0005100000562",
+						"perspective": "front",
+						"size": "small"
+					}, {
+						"url": "https://www.kroger.com/product/images/xlarge/front/0005100000562",
+						"perspective": "front",
+						"size": "xlarge"
+					}, {
+						"url": "https://www.kroger.com/product/images/small/left/0005100000562",
+						"perspective": "left",
+						"size": "small"
+					}
+					],
+					"mainImagePerspective": "front",
+					"multipackItem": false,
+					"multipackQuantity": "0",
+					"options": [],
+					"romanceDescription": null,
+					"seoDescription": "campbell-s-chunky-savory-chicken-soup-with-white-wild-rice",
+					"serviceCounter": null,
+					"shipToHomeItem": false,
+					"soldInStore": false,
+					"temperatureIndicator": "Ambient",
+					"verified": true,
+					"mainImage": "https://www.kroger.com/product/images/medium/front/0005100000562",
+					"slug": "campbell-s-chunky-savory-chicken-soup-with-white-wild-rice",
+					"categories": [{
+						"name": "Canned & Packaged",
+						"code": "12",
+						"categoryCode": "12",
+						"categoryName": "Canned & Packaged",
+						"category": "Canned & Packaged"
+					}
+					],
+					"calculatedPromoPrice": null,
+					"calculatedRegularPrice": null,
+					"calculatedReferencePrice": null,
+					"displayTemplate": null,
+					"division": null,
+					"minimumAdvertisedPrice": null,
+					"orderBy": null,
+					"regularNFor": null,
+					"referenceNFor": null,
+					"referencePrice": null,
+					"store": null,
+					"endDate": null,
+					"priceNormal": null,
+					"priceSale": null,
+					"promoDescription": null,
+					"promoType": null,
+					"soldBy": null,
+					"promoNfor": null,
+					"complementProductIds": null,
+					"upc": "0005100000562",
+					"couponId": null,
+					"offers": [],
+					"couponIds": [],
+					"monetizationInfo": null,
+					"hasPrice": false,
+					"loyalMember": false,
+					"primaryIndex": 6,
+					"curbsidePickupEligible": false
+				}, {
+					"brandName": "Progresso",
+					"clickListItem": false,
+					"countryOfOrigin": null,
+					"customerFacingSize": "18.5 oz",
+					"description": "Progresso Light Zesty! Santa Fe Style Chicken Soup",
+					"forceSize": null,
+					"homeDeliveryItem": false,
+					"images": [{
+						"url": "https://www.kroger.com/product/images/small/right/0004119640483",
+						"perspective": "right",
+						"size": "small"
+					}, {
+						"url": "https://www.kroger.com/product/images/xlarge/left/0004119640483",
+						"perspective": "left",
+						"size": "xlarge"
+					}, {
+						"url": "https://www.kroger.com/product/images/small/left/0004119640483",
+						"perspective": "left",
+						"size": "small"
+					}, {
+						"url": "https://www.kroger.com/product/images/large/front/0004119640483",
+						"perspective": "front",
+						"size": "large"
+					}, {
+						"url": "https://www.kroger.com/product/images/large/left/0004119640483",
+						"perspective": "left",
+						"size": "large"
+					}, {
+						"url": "https://www.kroger.com/product/images/thumbnail/right/0004119640483",
+						"perspective": "right",
+						"size": "thumbnail"
+					}, {
+						"url": "https://www.kroger.com/product/images/medium/front/0004119640483",
+						"perspective": "front",
+						"size": "medium"
+					}, {
+						"url": "https://www.kroger.com/product/images/thumbnail/left/0004119640483",
+						"perspective": "left",
+						"size": "thumbnail"
+					}, {
+						"url": "https://www.kroger.com/product/images/large/right/0004119640483",
+						"perspective": "right",
+						"size": "large"
+					}, {
+						"url": "https://www.kroger.com/product/images/medium/left/0004119640483",
+						"perspective": "left",
+						"size": "medium"
+					}, {
+						"url": "https://www.kroger.com/product/images/small/front/0004119640483",
+						"perspective": "front",
+						"size": "small"
+					}, {
+						"url": "https://www.kroger.com/product/images/thumbnail/front/0004119640483",
+						"perspective": "front",
+						"size": "thumbnail"
+					}, {
+						"url": "https://www.kroger.com/product/images/xlarge/right/0004119640483",
+						"perspective": "right",
+						"size": "xlarge"
+					}, {
+						"url": "https://www.kroger.com/product/images/medium/right/0004119640483",
+						"perspective": "right",
+						"size": "medium"
+					}, {
+						"url": "https://www.kroger.com/product/images/xlarge/front/0004119640483",
+						"perspective": "front",
+						"size": "xlarge"
+					}
+					],
+					"mainImagePerspective": "front",
+					"multipackItem": false,
+					"multipackQuantity": "0",
+					"options": [],
+					"romanceDescription": null,
+					"seoDescription": "progresso-light-zesty-santa-fe-style-chicken-soup",
+					"serviceCounter": null,
+					"shipToHomeItem": false,
+					"soldInStore": false,
+					"temperatureIndicator": "Ambient",
+					"verified": true,
+					"mainImage": "https://www.kroger.com/product/images/medium/front/0004119640483",
+					"slug": "progresso-light-zesty-santa-fe-style-chicken-soup",
+					"categories": [{
+						"name": "Canned & Packaged",
+						"code": "12",
+						"categoryCode": "12",
+						"categoryName": "Canned & Packaged",
+						"category": "Canned & Packaged"
+					}
+					],
+					"calculatedPromoPrice": null,
+					"calculatedRegularPrice": null,
+					"calculatedReferencePrice": null,
+					"displayTemplate": null,
+					"division": null,
+					"minimumAdvertisedPrice": null,
+					"orderBy": null,
+					"regularNFor": null,
+					"referenceNFor": null,
+					"referencePrice": null,
+					"store": null,
+					"endDate": null,
+					"priceNormal": null,
+					"priceSale": null,
+					"promoDescription": null,
+					"promoType": null,
+					"soldBy": null,
+					"promoNfor": null,
+					"complementProductIds": null,
+					"upc": "0004119640483",
+					"couponId": null,
+					"offers": [],
+					"couponIds": [],
+					"monetizationInfo": null,
+					"hasPrice": false,
+					"loyalMember": false,
+					"primaryIndex": 7,
+					"curbsidePickupEligible": false
+				}]
+			};
 
 		}
 	</script>
