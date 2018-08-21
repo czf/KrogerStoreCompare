@@ -35,7 +35,7 @@
 
 		<div class="w3-row">
 			<input class="w3-input w3-theme w3-border " name="zipcity" id="searchStoreInput" type="text" value="asdf">
-			<button class="w3-button w3-ripple w3-center fa fa-search w3-block w3-col" id="searchStoreGo"></button>
+			<button class="w3-button w3-ripple w3-center fa fa-search w3-block w3-col w3-theme" id="searchStoreGo"></button>
 		</div>
 		<div id="storesSwiper" class="swiper-container">
 			<div class="swiper-pagination"></div>
@@ -48,13 +48,17 @@
 
 		<div class="w3-row w3-hide">
 			<input class="w3-input w3-theme w3-border " name="product" id="searchProductInput" type="text" value="product">
-			<button class="w3-button w3-ripple w3-center fa fa-search w3-block w3-col" id="searchProductGo"></button>
+			<button class="w3-button w3-ripple w3-center fa fa-search w3-block w3-col w3-theme" id="searchProductGo"></button>
 		</div>
 		<div id="productsSwiper" class="swiper-container">
 			<div class="swiper-pagination"></div>
 			<div class="swiper-button-prev"></div>
 			<div class="swiper-button-next"></div>
 			<div class="swiper-wrapper"></div>
+		</div>
+		
+		<div id="getProductComparison" class="w3-row w3-hide">
+			<button class="w3-button w3-bar"></button>
 		</div>
 
 		<!--<div class="w3-row">
@@ -89,7 +93,7 @@
 				<h3>VanityName</h3>
 			</header>
 			<div class="w3-container"> <p>address</p> <p>distance</p></div>
-			<footer class="w3-container"><h5 class="w3-center"><button class="w3-button w3-ripple w3-center">add store</button>  </h5></footer>
+			<footer class="w3-container"><h5 class="w3-center"><button class="w3-button w3-ripple w3-center w3-theme">add store</button>  </h5></footer>
 
 		</div>
 		<div id="storeWrapperTemplate" class="w3-row swiper-slide"></div>
@@ -108,7 +112,7 @@
 
 			</div>
 			<footer class="w3-container">
-				<h5 class="w3-center"><button class="w3-button w3-ripple w3-center">add product</button> </h5>
+				<h5 class="w3-center"><button class="w3-button w3-ripple w3-center w3-theme">add product</button> </h5>
 			</footer>
 		</div>
 		<div id="productWrapperTemplate" class="w3-row swiper-slide"></div>
@@ -117,7 +121,7 @@
 		<div class="w3-modal-content">
 			<div class="w3-container">
 				<span onclick="document.getElementById('storeLimit').style.display='none'"
-					  class="w3-button w3-display-topright">&times;</span>
+					  class="w3-button w3-display-topright w3-theme">&times;</span>
 				<p>You've reached the limit of stores for comparison. </p>
 				<p>You'll need to remove a store before another can be added. </p>
 			</div>
@@ -127,7 +131,7 @@
 		<div class="w3-modal-content">
 			<div class="w3-container">
 				<span onclick="document.getElementById('productLimit').style.display='none'"
-					  class="w3-button w3-display-topright">&times;</span>
+					  class="w3-button w3-display-topright w3-theme">&times;</span>
 				<p>You've reached the limit of products for comparison. </p>
 				<p>You'll need to remove a product before another can be added. </p>
 			</div>
@@ -139,6 +143,7 @@
 		$(readyFn);
 		function readyFn() {
 			const MAX_STORES = 2;
+			const MAX_PRODUCTS = 5;
 			let storeKeypress = "keypress.storeInput";
 			let storeClick = "click.storeGo";
 			let productKeypress = "keypress.productSearchInput";
@@ -148,6 +153,7 @@
 			addProductSearchBindings();
 
 			$("#storesSwiper").on("click.storeBtn", "button", payload, storeBtn);
+			$("#productsSwiper").on("click.productBtn", "button", payload, productBtn);
 
 			var mySwiper = new Swiper('.swiper-container', {
 				// Optional parameters
@@ -215,10 +221,11 @@
 
 
 			function productAddedHandler(e) {
-				if (payload.products.length === MAX_PRODUCTS) {
-					$("#searchProductInput").parent().removeClass('w3-hide');
-
+				if (Object.keys(payload.upcs).length >= 1 && payload.stores.length >= 1) {
+					$("#getProductComparison").removeClass('w3-hide');
 				}
+				
+				
 			}
 
 			function addProductSearchBindings() {
@@ -283,8 +290,6 @@
 						return storeCheck(element, store)
 					}
 				));
-
-
 			}
 
 			function storeCheck(element, target) {
@@ -293,6 +298,25 @@
 			}
 
 
+			function productBtn(event) {
+				let btn = $(event.target);
+				let upc = btn.attr('data-upc');
+				
+				let indx = Object.keys(payload.upcs).indexOf(upc);
+				if (indx > -1) {
+					delete payload.upcs[upc];
+					btn.text("add product");
+				}
+				else if (Object.keys(payload.upcs).length >= MAX_PRODUCTS) {
+					$("#productLimit").show();
+				}
+				else {
+					payload.upcs[upc] = {};
+					btn.text("remove product");
+					document.dispatchEvent(new Event('productAdded'));
+				}
+			}
+			
 			var apiClient = (function (client) {
 				console.log(client);
 				client.storeSearch = function (searchText) {
