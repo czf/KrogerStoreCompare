@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 	<title>Price Comparison</title>
@@ -58,7 +58,7 @@
 		</div>
 		
 		<div id="getProductComparison" class="w3-row w3-hide">
-			<button class="w3-button w3-bar"></button>
+			<button class="w3-button w3-bar w3-theme">Get Store Comparison</button>
 		</div>
 
 		<!--<div class="w3-row">
@@ -154,7 +154,7 @@
 
 			$("#storesSwiper").on("click.storeBtn", "button", payload, storeBtn);
 			$("#productsSwiper").on("click.productBtn", "button", payload, productBtn);
-
+			$("#getProductComparison").on("click.comparisonBtn", "button", payload, comparisonBtn);
 			var mySwiper = new Swiper('.swiper-container', {
 				// Optional parameters
 				//init: false,
@@ -179,15 +179,12 @@
 			document.addEventListener('productAdded', productAddedHandler);
 
 
-			if (true) {
-
-				$.ajax = ajax_response(mockStoreData);
-			}
+			
+			
 
 			function storeAddedHandler(e) {
 				if (payload.stores.length === MAX_STORES) {
 					$("#searchProductInput").parent().removeClass('w3-hide');
-
 				}
 			}
 
@@ -202,7 +199,6 @@
 				if (event.keyCode === 13) {
 					searchStoreGoFn(e);
 				}
-
 			}
 
 			function searchStoreGoFn(e) {
@@ -223,6 +219,8 @@
 			function productAddedHandler(e) {
 				if (Object.keys(payload.upcs).length >= 1 && payload.stores.length >= 1) {
 					$("#getProductComparison").removeClass('w3-hide');
+				} else {
+					$("#getProductComparison").addClass('w3-hide');
 				}
 				
 				
@@ -258,7 +256,15 @@
 
 
 
-
+			function comparisonBtn(e){
+				let comparisonPayload = {
+					"UPCs" : Object.keys(payload.upcs),
+					"RequestStoreInfos": payload.stores
+				};
+				
+				apiClient.requestComparison(comparisonPayload);
+				
+			}
 
 
 
@@ -305,6 +311,8 @@
 				let indx = Object.keys(payload.upcs).indexOf(upc);
 				if (indx > -1) {
 					delete payload.upcs[upc];
+					let addedEvent = new Event('productAdded');
+					document.dispatchEvent(addedEvent);
 					btn.text("add product");
 				}
 				else if (Object.keys(payload.upcs).length >= MAX_PRODUCTS) {
@@ -313,6 +321,7 @@
 				else {
 					payload.upcs[upc] = {};
 					btn.text("remove product");
+					
 					document.dispatchEvent(new Event('productAdded'));
 				}
 			}
@@ -347,11 +356,26 @@
 					}
 					return dfd.promise();
 				};
+				
+				client.requestComparison = function(request){
+					let dfd = $.Deferred();
+					console.log('comparison');
+					if(mock) {
+						displayEngine.displayComparison(mockComparisonData);
+						dfd.resolve();
+					}
+					else{
+						$.ajax(request).done(
+							function (comparisonData){ displayEngine.displayComparison(comparisonData); dfd.resolve();});
+					}
+				}
 
 				return client;
 			})(function () { });
 
 			var displayEngine = (function (engine) {
+				engine.displayComparison = function(comparisonData){};
+
 				engine.displayStores = function (storeData) {
 					console.log('display');
 					if (storeData === undefined) { storeData = mockStoreData; }
@@ -468,6 +492,9 @@
 				};
 			}
 			var mock = true;
+			
+			var mockComparisonData = {};
+			
 			var mockStoreData = {
 				Stores: [
 					{
