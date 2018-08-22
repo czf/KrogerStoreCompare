@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 	<title>Price Comparison</title>
@@ -56,36 +56,86 @@
 			<div class="swiper-button-next"></div>
 			<div class="swiper-wrapper"></div>
 		</div>
-		
+
 		<div id="getProductComparison" class="w3-row w3-hide">
 			<button class="w3-button w3-bar w3-theme">Get Store Comparison</button>
 		</div>
 
 		<!--<div class="w3-row">
-			<div class="w3-card w3-third">
-				<header class="w3-container">
-					<h3>Store</h3>
-				</header>
-					<div class="w3-container"> <p> some info</p></div>
-					<footer class="w3-container"><h5>footer </h5></footer>
-			</div>
-			<div class="w3-card w3-third">
-				<header class="w3-container">
-					<h3>Store</h3>
-				</header>
-					<div class="w3-container"> <p> some info</p></div>
-					<footer class="w3-container"><h5>footer </h5></footer>
-			</div>
-			<div class="w3-card w3-third">
-				<header class="w3-container">
-					<h3>Store</h3>
-				</header>
-					<div class="w3-container"> <p> some info</p></div>
-					<footer class="w3-container"><h5>footer </h5></footer>
-			</div>
-		</div>-->
+		<div class="w3-card w3-third">
+			<header class="w3-container">
+				<h3>Store</h3>
+			</header>
+				<div class="w3-container"> <p> some info</p></div>
+				<footer class="w3-container"><h5>footer </h5></footer>
+		</div>
+		<div class="w3-card w3-third">
+			<header class="w3-container">
+				<h3>Store</h3>
+			</header>
+				<div class="w3-container"> <p> some info</p></div>
+				<footer class="w3-container"><h5>footer </h5></footer>
+		</div>
+		<div class="w3-card w3-third">
+			<header class="w3-container">
+				<h3>Store</h3>
+			</header>
+				<div class="w3-container"> <p> some info</p></div>
+				<footer class="w3-container"><h5>footer </h5></footer>
+		</div>
+	</div>-->
 		<!-- </div> -->
+		<div class="w3-row">
+			<div class="w3-col s4">&nbsp;</div>
+			<div id="comparisonSwiper" class="w3-col s8 swiper-container">
+				<div class="swiper-pagination"></div>
+				<div class="swiper-button-prev"></div>
+				<div class="swiper-button-next"></div>
+				<div class="swiper-wrapper">
+					<div class="swiper-slide">
+						<div class="w3-row">Product 1 Name</div>
+						<div class="w3-row">Product 1 price 1</div>
+						<div class="w3-row">Product 1 price 2</div>
+						<div class="w3-row">Product 1 price 3</div>
+					</div>
+				</div>
+				<div class="swiper-wrapper">
+					<div class="swiper-slide">
+						<div class="w3-row">Product 2 Name</div>
+						<div class="w3-row">Product 2 price 1</div>
+						<div class="w3-row">Product 2 price 2</div>
+						<div class="w3-row">Product 2 price 3</div>
+					</div>
+				</div>
+				<div class="swiper-wrapper">
+					<div class="swiper-slide">
+						<div class="w3-row">Product 3 Name</div>
+						<div class="w3-row">Product 3 price 1</div>
+						<div class="w3-row">Product 3 price 2</div>
+						<div class="w3-row">Product 3 price 3</div>
+					</div>
+				</div>
+				<div class="swiper-wrapper">
+					<div class="swiper-slide">
+						<div class="w3-row">Product 4 Name</div>
+						<div class="w3-row">Product 4 price 1</div>
+						<div class="w3-row">Product 4 price 2</div>
+						<div class="w3-row">Product 4 price 3</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+		<div class="w3-row">
+			<div class="w3-col s4">store name and store address thats really long</div>
+			
+
+		</div>
 	</div>
+
+	
+
+
 	<div style="height:525px;"></div>
 	<div class="w3-hide">
 		<div id="storeTemplate" class="w3-card w3-third ">
@@ -155,7 +205,7 @@
 			$("#storesSwiper").on("click.storeBtn", "button", payload, storeBtn);
 			$("#productsSwiper").on("click.productBtn", "button", payload, productBtn);
 			$("#getProductComparison").on("click.comparisonBtn", "button", payload, comparisonBtn);
-			var mySwiper = new Swiper('.swiper-container', {
+			var mySwiper = new Swiper('#storesSwiper.swiper-container, #productsSwiper.swiper-container', {
 				// Optional parameters
 				//init: false,
 				direction: 'horizontal',
@@ -175,11 +225,53 @@
 
 			});
 
+			var comparisonSwiper = new Swiper('#comparisonSwiper.swiper-container', {
+				// Optional parameters
+				//init: false,
+				direction: 'horizontal',
+				loop: true,
+
+				grabCursor: true,
+				// If we need pagination
+				pagination: {
+					el: '.swiper-pagination',
+				},
+				slidesPerView: 4,
+				// Responsive breakpoints
+				breakpoints: {
+					// when window width is <= 320px
+					400: {
+						slidesPerView: 1,
+						spaceBetween: 10
+					},
+					// when window width is <= 480px
+					600: {
+						slidesPerView: 2,
+						spaceBetween: 20
+					},
+					// when window width is <= 640px
+					800: {
+						slidesPerView: 3,
+						spaceBetween: 30
+					}
+				},
+
+
+				// Navigation arrows
+				navigation: {
+					nextEl: '.swiper-button-next',
+					prevEl: '.swiper-button-prev',
+				},
+
+			});
+
 			document.addEventListener('storeAdded', storeAddedHandler);
 			document.addEventListener('productAdded', productAddedHandler);
 
 
+
 			
+
 			
 
 			function storeAddedHandler(e) {
@@ -1720,6 +1812,16 @@
 					"curbsidePickupEligible": false
 				}]
 			};
+
+
+
+			if (mock) {
+				$("#searchStoreGo").click();
+				$("#storesSwiper button.w3-theme").slice(0, 2).click();
+				$("#searchProductGo").click();
+				$("#productsSwiper button.w3-theme").slice(0, 5).click();
+				$("#getProductComparison button.w3-theme").click();
+			}
 
 		}
 	</script>
