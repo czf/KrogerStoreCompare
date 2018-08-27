@@ -25,8 +25,8 @@ namespace KrogerStoreCompare
 
             MapperConfiguration mapperConfiguration = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<ProductDetail, ProductData>();
-                cfg.CreateMap<ProductDetail, StorePricing>();
+                cfg.CreateMap<ProductDetail, StorePrice>();
+                cfg.CreateMap<ProductDetail, ProductStorePrice>();
             }
             
 

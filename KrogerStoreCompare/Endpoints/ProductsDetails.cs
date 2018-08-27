@@ -39,28 +39,36 @@ namespace KrogerStoreCompare.Endpoints
 
             Task.WaitAll(productsDetailsResponses);
 
-            Dictionary<string, ProductData> prods = new Dictionary<string, ProductData>();
-            for(int a = 0; a < productsDetailsResponses.Length; a++)
+           
+
+            Dictionary<string, ProductStorePrice> productStorePrices = new Dictionary<string, ProductStorePrice>();
+            List<StoreIdentifier> noProductsReturned = new List<StoreIdentifier>();
+            for(int a = 0; a< productsDetailsResponses.Length; a++)
             {
-                var result = productsDetailsResponses[a].Result;
+                ProductsDetailsResponse result = productsDetailsResponses[a].Result;
+                if(result.TotalCount == 0)
+                {
+
+                    noProductsReturned.Add(storesProductsRequests.RequestStoreInfos[a]);
+                }
                 foreach(ProductDetail product in result.Products)
                 {
-                    if (!prods.ContainsKey(product.UPC))
+                    if (!productStorePrices.ContainsKey(product.UPC))
                     {
-                        prods[product.UPC] = Startup.Mapper.Map<ProductData>(product);
-                        
+                        productStorePrices[product.UPC] = Startup.Mapper.Map<ProductStorePrice>(product);
                     }
+                    productStorePrices[product.UPC].StorePrices.Add(Startup.Mapper.Map<StorePrice>(product));
+
                     StoreIdentifier si = new StoreIdentifier()
                     {
                         DivisionId = storesProductsRequests.RequestStoreInfos[a].DivisionId,
                         StoreId = storesProductsRequests.RequestStoreInfos[a].StoreId
                     };
-                    prods[product.UPC].StorePrices[si] = Startup.Mapper.Map<StorePricing>(product);
-                    prods[product.UPC].StorePrices[si].StoreIdentifier = si;
+                    productStorePrices[product.UPC].StorePrices.Last().StoreIdentifier = si;
                 }
             }
-            
-            return req.CreateResponse(HttpStatusCode.OK, prods.Values);
+
+            return req.CreateResponse(HttpStatusCode.OK, new { ProductStorePrices = productStorePrices.Values,  NoProductsReturned = noProductsReturned});
         }
     }     
 }

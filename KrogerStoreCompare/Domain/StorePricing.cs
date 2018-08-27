@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace KrogerStoreCompare.Domain
 {
-    public class StorePricing
+    public class StorePrice
     {
         public StoreIdentifier StoreIdentifier { get; set; }
         public decimal? CalculatedReferencePrice { get; set; }
