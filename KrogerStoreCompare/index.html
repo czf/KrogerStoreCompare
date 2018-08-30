@@ -22,6 +22,7 @@
 
 		.swiper-slide.w3-row {
 			padding-bottom: 37px;
+			display:flex;
 		}
 
 		#productsSwiper .w3-card {
@@ -185,12 +186,12 @@
 
 		<div style="height:525px;"></div>
 		<div class="w3-hide">
-			<div id="storeTemplate" class="w3-card w3-third ">
+			<div id="storeTemplate" class="w3-card w3-third" style="display:flex;flex-direction:column">
 				<header class="w3-container">
 					<h3>VanityName</h3>
 				</header>
 				<div class="w3-container"> <p>address</p> <p>distance</p></div>
-				<footer class="w3-container"><h5 class="w3-center"><button class="w3-button w3-ripple w3-center w3-theme">add store</button>  </h5></footer>
+				<footer class="w3-container " style="display: flex;flex-direction: column;flex-grow: 1;justify-content: flex-end;align-items: center;"><h5 class="w3-center"><button class="w3-button w3-ripple w3-center w3-theme">add store</button>  </h5></footer>
 
 			</div>
 			<div id="storeWrapperTemplate" class="w3-row swiper-slide"></div>
