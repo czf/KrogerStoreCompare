@@ -22,7 +22,7 @@
 
 		.swiper-slide.w3-row {
 			padding-bottom: 37px;
-			display:flex;
+			/*display:flex;*/
 		}
 
 		#productsSwiper .w3-card {
@@ -30,7 +30,7 @@
 		}
 
 		th, td {
-			white-space: nowrap;
+			/*white-space: nowrap;*/
 		}
 
 		/*div.dataTables_wrapper {
@@ -76,125 +76,60 @@
 			<button class="w3-button w3-bar w3-theme">Get Store Comparison</button>
 		</div>
 
-		<!--<div class="w3-row">
-		<div class="w3-card w3-third">
-			<header class="w3-container">
-				<h3>Store</h3>
-			</header>
-				<div class="w3-container"> <p> some info</p></div>
-				<footer class="w3-container"><h5>footer </h5></footer>
-		</div>
-		<div class="w3-card w3-third">
-			<header class="w3-container">
-				<h3>Store</h3>
-			</header>
-				<div class="w3-container"> <p> some info</p></div>
-				<footer class="w3-container"><h5>footer </h5></footer>
-		</div>
-		<div class="w3-card w3-third">
-			<header class="w3-container">
-				<h3>Store</h3>
-			</header>
-				<div class="w3-container"> <p> some info</p></div>
-				<footer class="w3-container"><h5>footer </h5></footer>
-		</div>
-	</div>-->
-		<!-- </div> -->
-		<div class="w3-row w3-hide">
-			<div class="w3-col s4">&nbsp;</div>
-			<div id="comparisonSwiper" class="w3-col s8 swiper-container">
-				<div class="swiper-pagination"></div>
-				<div class="swiper-button-prev"></div>
-				<div class="swiper-button-next"></div>
-				<div class="swiper-wrapper">
-					<div class="swiper-slide">
-						<div class="w3-row">Product 1 Name</div>
-						<div class="w3-row">Product 1 price 1</div>
-						<div class="w3-row">Product 1 price 2</div>
-						<div class="w3-row">Product 1 price 3</div>
-					</div>
-				</div>
-				<div class="swiper-wrapper">
-					<div class="swiper-slide">
-						<div class="w3-row">Product 2 Name</div>
-						<div class="w3-row">Product 2 price 1</div>
-						<div class="w3-row">Product 2 price 2</div>
-						<div class="w3-row">Product 2 price 3</div>
-					</div>
-				</div>
-				<div class="swiper-wrapper">
-					<div class="swiper-slide">
-						<div class="w3-row">Product 3 Name</div>
-						<div class="w3-row">Product 3 price 1</div>
-						<div class="w3-row">Product 3 price 2</div>
-						<div class="w3-row">Product 3 price 3</div>
-					</div>
-				</div>
-				<div class="swiper-wrapper">
-					<div class="swiper-slide">
-						<div class="w3-row">Product 4 Name</div>
-						<div class="w3-row">Product 4 price 1</div>
-						<div class="w3-row">Product 4 price 2</div>
-						<div class="w3-row">Product 4 price 3</div>
-					</div>
-				</div>
 
-			</div>
-		</div>
-		
-			<table id="comparison" class="stripe row-border order-column" style="width:100%" >
-				<thead>
-					<tr>
-						<th>head</th>
-						<th>head2</th>
-						<th>head</th>
-						<th>head2</th>
-						<th>head</th>
-						<th>head2</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td>a</td>
-						<td>a</td>
-						<td>a</td>
-						<td>a</td>
-						<td>a</td>
-						<td>a</td>
-					</tr>
-					<tr>
-						<td>b</td>
-						<td>b</td>
-						<td>b</td>
-						<td>b</td>
-						<td>b</td>
-						<td>b</td>
-					</tr>
-					<tr>
-						<td>c</td>
-						<td>c</td>
-						<td>c</td>
-						<td>c</td>
-						<td>c</td>
-						<td>c</td>
-					</tr>
-				</tbody>
-			</table>
-	
+		<table id="comparison" class="stripe row-border order-column" style="width:100%">
+			<thead>
+				<tr>
+					<th>head</th>
+					<th>head2</th>
+					<th>head</th>
+					<th>head2</th>
+					<th>head</th>
+					<th>head2</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>a1</td>
+					<td>a2</td>
+					<td>a3</td>
+					<td>a4</td>
+					<td>a5</td>
+					<td>a6</td>
+				</tr>
+				<tr>
+					<td>b1</td>
+					<td>b2</td>
+					<td>b3</td>
+					<td>b4</td>
+					<td>b5</td>
+					<td>b6</td>
+				</tr>
+				<tr>
+					<td>c</td>
+					<td>c</td>
+					<td>c</td>
+					<td>c</td>
+					<td>c</td>
+					<td>c</td>
+				</tr>
+			</tbody>
+		</table>
+
 
 
 
 		<div style="height:525px;"></div>
 		<div class="w3-hide">
-			<div id="storeTemplate" class="w3-card w3-third" style="display:flex;flex-direction:column">
+			<div id="storeTemplate" class="w3-card w3-third w3-cell w3-mobile " style="">
 				<header class="w3-container">
 					<h3>VanityName</h3>
 				</header>
 				<div class="w3-container"> <p>address</p> <p>distance</p></div>
-				<footer class="w3-container " style="display: flex;flex-direction: column;flex-grow: 1;justify-content: flex-end;align-items: center;"><h5 class="w3-center"><button class="w3-button w3-ripple w3-center w3-theme">add store</button>  </h5></footer>
+				<footer class="w3-container " style=""><h5 class="w3-center"><button class="w3-button w3-ripple w3-center w3-theme">add store</button>  </h5></footer>
 
 			</div>
-			<div id="storeWrapperTemplate" class="w3-row swiper-slide"></div>
+			<div id="storeWrapperTemplate" class="w3-row swiper-slide w3-cell-row"></div>
 			<div id="productTemplate" class="w3-card w3-third w3-center">
 				<div class="w3-container ">
 					<picture>
@@ -235,6 +170,16 @@
 				</div>
 			</div>
 		</div>
+		<div class=" w3-red w3-cell">
+			<p>Hello W3.CSS Layout.</p>
+		</div>
+
+		<div class="w3-green w3-cell">
+			<p>Hello W3.CSS Layout.</p>
+			<p>Hello W3.CSS Layout.</p>
+			<p>Hello W3.CSS Layout.</p>
+			<p>Hello W3.CSS Layout.</p>
+		</div>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.3.5/js/swiper.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.19/js/jquery.dataTables.min.js"></script>
@@ -250,13 +195,14 @@
 				let storeClick = "click.storeGo";
 				let productKeypress = "keypress.productSearchInput";
 				let productSearchClick = "click.productSearchGo";
+				let comparisonClick = "click.comparisonBtn";
 				let payload = { stores: [], upcs: [] };
 				addStoreSearchBindings();
 				addProductSearchBindings();
 
 				$("#storesSwiper").on("click.storeBtn", "button", payload, storeBtn);
 				$("#productsSwiper").on("click.productBtn", "button", payload, productBtn);
-				$("#getProductComparison").on("click.comparisonBtn", "button", payload, comparisonBtn);
+				$("#getProductComparison").on(comparisonClick, "button", payload, comparisonBtn);
 				var mySwiper = new Swiper('#storesSwiper.swiper-container, #productsSwiper.swiper-container', {
 					// Optional parameters
 					//init: false,
@@ -277,58 +223,20 @@
 
 				});
 
-				var comparisonSwiper = new Swiper('#comparisonSwiper.swiper-container', {
-					// Optional parameters
-					//init: false,
-					direction: 'horizontal',
-					loop: true,
+			
 
-					grabCursor: true,
-					// If we need pagination
-					pagination: {
-						el: '.swiper-pagination',
-					},
-					slidesPerView: 4,
-					// Responsive breakpoints
-					breakpoints: {
-						// when window width is <= 320px
-						400: {
-							slidesPerView: 1,
-							spaceBetween: 10
-						},
-						// when window width is <= 480px
-						600: {
-							slidesPerView: 2,
-							spaceBetween: 20
-						},
-						// when window width is <= 640px
-						800: {
-							slidesPerView: 3,
-							spaceBetween: 30
-						}
-					},
-
-
-					// Navigation arrows
-					navigation: {
-						nextEl: '.swiper-button-next',
-						prevEl: '.swiper-button-prev',
-					},
-
-				});
-				
-				var table = $('#comparison').DataTable({
-						responsive:true,
-						searching: false,
-						scrollY: "300px",
-						scrollX: true,
-						scrollCollapse: true,
-						paging: false,
-						fixedColumns: {
-							leftColumns: 1,
-							rightColumns: 0
-						}
-					});
+				//var table = $('#comparison').DataTable({
+				//	responsive: true,
+				//	searching: false,
+				//	scrollY: "300px",
+				//	scrollX: true,
+				//	scrollCollapse: true,
+				//	paging: false,
+				//	fixedColumns: {
+				//		leftColumns: 1,
+				//		rightColumns: 0
+				//	}
+				//});
 
 
 				document.addEventListener('storeAdded', storeAddedHandler);
@@ -415,13 +323,18 @@
 
 
 				function comparisonBtn(e) {
+					$("#getProductComparison").off("click.comparisonBtn").find("button").attr("disabled","");
 					let comparisonPayload = {
 						"UPCs": Object.keys(payload.upcs),
 						"RequestStoreInfos": payload.stores
 					};
 
-					apiClient.requestComparison(comparisonPayload);
+					apiClient.requestComparison(comparisonPayload).always(addComparisonBindings);
 
+				}
+
+				function addComparisonBindings() {
+					$("#getProductComparison").on(comparisonClick, "button",  payload, comparisonBtn).find("button").attr("disabled", null);
 				}
 
 
@@ -431,7 +344,8 @@
 					let btn = $(event.target);
 					let storeObj = {
 						StoreId: btn.attr('data-storenumber'),
-						DivisionId: btn.attr('data-divisionnumber')
+						DivisionId: btn.attr('data-divisionnumber'),
+						Name: btn.attr("data-name")
 					};
 					let indx = undefined;
 					if ((indx = indexOfStore(storeObj)) >= 0) {
@@ -484,7 +398,7 @@
 					}
 				}
 
-				var apiClient = (function (client) {
+				var apiClient = (function (client) {  //refactor so data is returned as resolve and display is called outside
 					console.log(client);
 					client.storeSearch = function (searchText) {
 						let dfd = $.Deferred();
@@ -526,13 +440,94 @@
 							$.ajax(request).done(
 								function (comparisonData) { displayEngine.displayComparison(comparisonData); dfd.resolve(); });
 						}
+						return dfd.promise();
 					}
 
 					return client;
 				})(function () { });
 
 				var displayEngine = (function (engine) {
-					engine.displayComparison = function (comparisonData) { };
+					engine.displayComparison = function (comparisonData) {
+						console.log("display comparison");
+						if (comparisonData === undefined) { comparisonData = mockComparisonData; }
+						let storeProducts = comparisonData.ProductStorePrices;
+						let noProductStores = comparisonData.NoProductsReturned;
+						let table = document.createElement("table");
+						
+						let tHead = document.createElement("thead");
+						let headRow = document.createElement("tr");
+						headRow.appendChild(document.createElement("th"));
+						console.log(payload.stores);
+						//$.each(payload.stores, function (index, store) {
+						payload.stores.forEach(function (store) {
+							if (!noProductStores.some(x => x.DivisionId === store.DivisionId &&
+								x.StoreId === store.StoreId)) {
+								let th = document.createElement("th");
+								th.innerText = store.Name;
+								headRow.appendChild(th);
+							}
+						});
+						tHead.appendChild(headRow);
+
+						let tBody = document.createElement("tbody");
+						//$.each(storeProcuts, function (index, store) {
+						storeProducts.forEach(function (product) {
+							let tr = document.createElement("tr");
+							let cell = document.createElement("td");
+							cell.innerText = product.Description;
+							tr.appendChild(cell);
+							product.StorePrices.forEach(function (storePrice) {
+								let priceCell = document.createElement("td");
+								if (storePrice.PriceSale) {
+									priceCell.innerText = storePrice.PriceSale + " ";
+									let sPrice = document.createElement("s");
+									sPrice.innerText = storePrice.PriceNormal;
+									priceCell.appendChild(sPrice);
+
+								} else {
+									priceCell.innerText = storePrice.PriceNormal;
+								}
+								tr.appendChild(priceCell);
+							});
+							tBody.appendChild(tr);
+						});
+						table.appendChild(tHead);
+						table.appendChild(tBody);
+						$("#comparison").remove()
+						table.setAttribute("id", "comparison");
+						table.className = "stripe row-border order-column";
+						//table.style = "width:100%;";
+						document.body.appendChild(table);
+						$('#comparison').DataTable({
+							
+							searching: false,
+							scrollY: "300px",
+							scrollX: true,
+							scrollCollapse: true,
+							paging: false,
+							fixedColumns: {
+								leftColumns: 1,
+								rightColumns: 0
+							}
+							//responsive: {
+							//	breakpoints: [
+							//		{ name: 'bigdesktop', width: Infinity },
+							//		{ name: 'meddesktop', width: 1480 },
+							//		{ name: 'smalldesktop', width: 1280 },
+							//		{ name: 'medium', width: 1188 },
+							//		{ name: 'tabletl', width: 1024 },
+							//		{ name: 'btwtabllandp', width: 848 },
+							//		{ name: 'tabletp', width: 768 },
+							//		{ name: 'mobilel', width: 480 },
+							//		{ name: 'mobilep', width: 320 }
+							//	]
+							//}
+						});
+
+
+
+
+					};
 
 					engine.displayStores = function (storeData) {
 						console.log('display');
@@ -561,6 +556,7 @@
 								store.address.zip;
 							paragraphs[1].innerText = store.distance + " mi."
 							let button = clone.find("button").eq(0);
+							button.attr("data-name", store.vanityName);
 							button.attr('data-storenumber', store.storeNumber);
 							button.attr('data-divisionnumber', store.divisionNumber)
 							let storeObj = {
@@ -641,7 +637,7 @@
 						}
 					));
 				}
-				
+
 
 
 				function ajax_response(response) {
@@ -667,20 +663,20 @@
 							"PriceNormal": 1.99,
 							"CalculatedPromoPrice": null
 						},
-							{
-								"StoreIdentifier": {
-									"DivisionId": "672",
-									"StoreId": "00721"
-								},
-								"CalculatedReferencePrice": null,
-								"MinimumAdvertisedPrice": null,
-								"ReferencePrice": null,
-								"CalculateRegularPrice": null,
-								"PriceSale": null,
-								"HasPrice": true,
-								"PriceNormal": 1.99,
-								"CalculatedPromoPrice": null
-							}
+						{
+							"StoreIdentifier": {
+								"DivisionId": "672",
+								"StoreId": "00721"
+							},
+							"CalculatedReferencePrice": null,
+							"MinimumAdvertisedPrice": null,
+							"ReferencePrice": null,
+							"CalculateRegularPrice": null,
+							"PriceSale": null,
+							"HasPrice": true,
+							"PriceNormal": 1.99,
+							"CalculatedPromoPrice": null
+						}
 						],
 						"BrandName": "Progresso",
 						"ClickListItem": true,
@@ -806,7 +802,7 @@
 							"MinimumAdvertisedPrice": null,
 							"ReferencePrice": 1.39,
 							"CalculateRegularPrice": null,
-							"PriceSale": null,
+							"PriceSale": 1,
 							"HasPrice": true,
 							"PriceNormal": 1.25,
 							"CalculatedPromoPrice": null
@@ -915,20 +911,20 @@
 							"PriceNormal": 1.67,
 							"CalculatedPromoPrice": null
 						},
-							{
-								"StoreIdentifier": {
-									"DivisionId": "672",
-									"StoreId": "00721"
-								},
-								"CalculatedReferencePrice": null,
-								"MinimumAdvertisedPrice": null,
-								"ReferencePrice": null,
-								"CalculateRegularPrice": null,
-								"PriceSale": null,
-								"HasPrice": true,
-								"PriceNormal": 1.67,
-								"CalculatedPromoPrice": null
-							}
+						{
+							"StoreIdentifier": {
+								"DivisionId": "672",
+								"StoreId": "00721"
+							},
+							"CalculatedReferencePrice": null,
+							"MinimumAdvertisedPrice": null,
+							"ReferencePrice": null,
+							"CalculateRegularPrice": null,
+							"PriceSale": null,
+							"HasPrice": true,
+							"PriceNormal": 1.67,
+							"CalculatedPromoPrice": null
+						}
 						],
 						"BrandName": "Campbell's",
 						"ClickListItem": true,
@@ -1059,20 +1055,20 @@
 							"PriceNormal": 0.79,
 							"CalculatedPromoPrice": null
 						},
-							{
-								"StoreIdentifier": {
-									"DivisionId": "672",
-									"StoreId": "00721"
-								},
-								"CalculatedReferencePrice": null,
-								"MinimumAdvertisedPrice": null,
-								"ReferencePrice": null,
-								"CalculateRegularPrice": null,
-								"PriceSale": null,
-								"HasPrice": true,
-								"PriceNormal": 0.79,
-								"CalculatedPromoPrice": null
-							}
+						{
+							"StoreIdentifier": {
+								"DivisionId": "672",
+								"StoreId": "00721"
+							},
+							"CalculatedReferencePrice": null,
+							"MinimumAdvertisedPrice": null,
+							"ReferencePrice": null,
+							"CalculateRegularPrice": null,
+							"PriceSale": null,
+							"HasPrice": true,
+							"PriceNormal": 0.79,
+							"CalculatedPromoPrice": null
+						}
 						],
 						"BrandName": "Kroger",
 						"ClickListItem": true,
@@ -1163,20 +1159,20 @@
 							"PriceNormal": 2.89,
 							"CalculatedPromoPrice": null
 						},
-							{
-								"StoreIdentifier": {
-									"DivisionId": "672",
-									"StoreId": "00721"
-								},
-								"CalculatedReferencePrice": null,
-								"MinimumAdvertisedPrice": null,
-								"ReferencePrice": null,
-								"CalculateRegularPrice": null,
-								"PriceSale": null,
-								"HasPrice": true,
-								"PriceNormal": 2.89,
-								"CalculatedPromoPrice": null
-							}
+						{
+							"StoreIdentifier": {
+								"DivisionId": "672",
+								"StoreId": "00721"
+							},
+							"CalculatedReferencePrice": null,
+							"MinimumAdvertisedPrice": null,
+							"ReferencePrice": null,
+							"CalculateRegularPrice": null,
+							"PriceSale": null,
+							"HasPrice": true,
+							"PriceNormal": 2.89,
+							"CalculatedPromoPrice": null
+						}
 						],
 						"BrandName": "Campbell's",
 						"ClickListItem": true,
@@ -1323,7 +1319,7 @@
 				//	"DivisionId": "672",
 				//		"StoreId": "00721"
 				//}
-;
+				;
 
 				var mockStoreData = {
 					Stores: [
