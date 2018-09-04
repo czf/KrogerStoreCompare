@@ -29,9 +29,11 @@
 			padding-top: 4px;
 		}
 
-		th, td {
-			/*white-space: nowrap;*/
+		td {
+			white-space: nowrap;
 		}
+		div.dataTables_wrapper tr{height: 120px;}
+		s{font-size:70%;}
 
 		/*div.dataTables_wrapper {
 			width: 800px;
@@ -75,47 +77,8 @@
 		<div id="getProductComparison" class="w3-row w3-hide">
 			<button class="w3-button w3-bar w3-theme">Get Store Comparison</button>
 		</div>
-
-
-		<table id="comparison" class="stripe row-border order-column" style="width:100%">
-			<thead>
-				<tr>
-					<th>head</th>
-					<th>head2</th>
-					<th>head</th>
-					<th>head2</th>
-					<th>head</th>
-					<th>head2</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td>a1</td>
-					<td>a2</td>
-					<td>a3</td>
-					<td>a4</td>
-					<td>a5</td>
-					<td>a6</td>
-				</tr>
-				<tr>
-					<td>b1</td>
-					<td>b2</td>
-					<td>b3</td>
-					<td>b4</td>
-					<td>b5</td>
-					<td>b6</td>
-				</tr>
-				<tr>
-					<td>c</td>
-					<td>c</td>
-					<td>c</td>
-					<td>c</td>
-					<td>c</td>
-					<td>c</td>
-				</tr>
-			</tbody>
-		</table>
-
+		<div id="productComparisonContainer" class="w3-row">
+		</div>
 
 
 
@@ -170,16 +133,7 @@
 				</div>
 			</div>
 		</div>
-		<div class=" w3-red w3-cell">
-			<p>Hello W3.CSS Layout.</p>
-		</div>
-
-		<div class="w3-green w3-cell">
-			<p>Hello W3.CSS Layout.</p>
-			<p>Hello W3.CSS Layout.</p>
-			<p>Hello W3.CSS Layout.</p>
-			<p>Hello W3.CSS Layout.</p>
-		</div>
+		
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.3.5/js/swiper.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.19/js/jquery.dataTables.min.js"></script>
@@ -207,7 +161,7 @@
 					// Optional parameters
 					//init: false,
 					direction: 'horizontal',
-					loop: true,
+					loop: false,
 
 					grabCursor: true,
 					// If we need pagination
@@ -225,18 +179,7 @@
 
 			
 
-				//var table = $('#comparison').DataTable({
-				//	responsive: true,
-				//	searching: false,
-				//	scrollY: "300px",
-				//	scrollX: true,
-				//	scrollCollapse: true,
-				//	paging: false,
-				//	fixedColumns: {
-				//		leftColumns: 1,
-				//		rightColumns: 0
-				//	}
-				//});
+
 
 
 				document.addEventListener('storeAdded', storeAddedHandler);
@@ -457,47 +400,49 @@
 						let tHead = document.createElement("thead");
 						let headRow = document.createElement("tr");
 						headRow.appendChild(document.createElement("th"));
-						console.log(payload.stores);
-						//$.each(payload.stores, function (index, store) {
-						payload.stores.forEach(function (store) {
-							if (!noProductStores.some(x => x.DivisionId === store.DivisionId &&
-								x.StoreId === store.StoreId)) {
-								let th = document.createElement("th");
-								th.innerText = store.Name;
-								headRow.appendChild(th);
-							}
-						});
+						
+						storeProducts.forEach(function (product) {
+							let th = document.createElement("th");
+							th.innerText = product.Description + " " + product.CustomerFacingSize;
+							headRow.appendChild(th)
+						})
+
 						tHead.appendChild(headRow);
 
 						let tBody = document.createElement("tbody");
-						//$.each(storeProcuts, function (index, store) {
-						storeProducts.forEach(function (product) {
-							let tr = document.createElement("tr");
-							let cell = document.createElement("td");
-							cell.innerText = product.Description;
-							tr.appendChild(cell);
-							product.StorePrices.forEach(function (storePrice) {
-								let priceCell = document.createElement("td");
-								if (storePrice.PriceSale) {
-									priceCell.innerText = storePrice.PriceSale + " ";
-									let sPrice = document.createElement("s");
-									sPrice.innerText = storePrice.PriceNormal;
-									priceCell.appendChild(sPrice);
 
-								} else {
-									priceCell.innerText = storePrice.PriceNormal;
-								}
-								tr.appendChild(priceCell);
-							});
-							tBody.appendChild(tr);
+						payload.stores.forEach(function (store) {
+							if (!noProductStores.some(x => x.DivisionId === store.DivisionId &&
+								x.StoreId === store.StoreId)) {
+								let tr = document.createElement("tr");
+								let cell = document.createElement("td");
+								cell.innerText = store.Name;
+								tr.appendChild(cell);
+								storeProducts.forEach(function (storeProduct) {
+									storePrice = storeProduct.StorePrices.filter(x => x.StoreIdentifier.DivisionId === store.DivisionId && x.StoreIdentifier.StoreId === store.StoreId)[0];
+									let priceCell = document.createElement("td");
+									if (storePrice.PriceSale) {
+										priceCell.innerText = storePrice.PriceSale + " ";
+										let sPrice = document.createElement("s");
+										sPrice.innerText = storePrice.PriceNormal;
+										priceCell.appendChild(sPrice);
+
+									} else {
+										priceCell.innerText = storePrice.PriceNormal;
+									}
+									tr.appendChild(priceCell);
+								});
+								tBody.appendChild(tr);
+							}
 						});
 						table.appendChild(tHead);
 						table.appendChild(tBody);
-						$("#comparison").remove()
+						let container = document.getElementById("productComparisonContainer");
+						while (container.firstChild) container.removeChild(container.firstChild);
 						table.setAttribute("id", "comparison");
 						table.className = "stripe row-border order-column";
 						//table.style = "width:100%;";
-						document.body.appendChild(table);
+						container.appendChild(table);
 						$('#comparison').DataTable({
 							
 							searching: false,
@@ -507,7 +452,8 @@
 							paging: false,
 							fixedColumns: {
 								leftColumns: 1,
-								rightColumns: 0
+								rightColumns: 0,
+								heightMatch: 'none'
 							}
 							//responsive: {
 							//	breakpoints: [
@@ -573,7 +519,7 @@
 						let s = document.querySelector('#storesSwiper').swiper;
 						s.removeAllSlides();
 						s.appendSlide(wrappers.map(function (w) { return w[0] }));
-						s.slideTo(1);
+						//s.slideTo(1);
 
 					};
 
@@ -621,7 +567,7 @@
 						let s = document.querySelector('#productsSwiper').swiper;
 						s.removeAllSlides();
 						s.appendSlide(wrappers.map(function (w) { return w[0] }));
-						s.slideTo(1);
+						//s.slideTo(1);
 
 
 
@@ -652,7 +598,7 @@
 						"StorePrices": [{
 							"StoreIdentifier": {
 								"DivisionId": "615",
-								"StoreId": "00070"
+								"StoreId": "00040"
 							},
 							"CalculatedReferencePrice": null,
 							"MinimumAdvertisedPrice": null,
@@ -666,7 +612,7 @@
 						{
 							"StoreIdentifier": {
 								"DivisionId": "672",
-								"StoreId": "00721"
+								"StoreId": "00782"
 							},
 							"CalculatedReferencePrice": null,
 							"MinimumAdvertisedPrice": null,
@@ -778,7 +724,7 @@
 						"RegularNFor": "1",
 						"ReferenceNFor": "1",
 						"ReferencePrice": null,
-						"Store": "00070",
+						"Store": "00040",
 						"EndDate": "2018-09-05T00:00:00",
 						"PriceNormal": 1.99,
 						"PriceSale": null,
@@ -796,7 +742,7 @@
 						"StorePrices": [{
 							"StoreIdentifier": {
 								"DivisionId": "672",
-								"StoreId": "00721"
+								"StoreId": "00782"
 							},
 							"CalculatedReferencePrice": 1.39,
 							"MinimumAdvertisedPrice": null,
@@ -810,7 +756,7 @@
 						{
 							"StoreIdentifier": {
 								"DivisionId": "615",
-								"StoreId": "00070"
+								"StoreId": "00040"
 							},
 							"CalculatedReferencePrice": 1.39,
 							"MinimumAdvertisedPrice": null,
@@ -882,7 +828,7 @@
 						"RegularNFor": "4",
 						"ReferenceNFor": "4",
 						"ReferencePrice": 1.39,
-						"Store": "00070",
+						"Store": "00040",
 						"EndDate": null,
 						"PriceNormal": 1.25,
 						"PriceSale": null,
@@ -900,7 +846,7 @@
 						"StorePrices": [{
 							"StoreIdentifier": {
 								"DivisionId": "615",
-								"StoreId": "00070"
+								"StoreId": "00040"
 							},
 							"CalculatedReferencePrice": null,
 							"MinimumAdvertisedPrice": null,
@@ -914,7 +860,7 @@
 						{
 							"StoreIdentifier": {
 								"DivisionId": "672",
-								"StoreId": "00721"
+								"StoreId": "00782"
 							},
 							"CalculatedReferencePrice": null,
 							"MinimumAdvertisedPrice": null,
@@ -1026,7 +972,7 @@
 						"RegularNFor": "3",
 						"ReferenceNFor": "3",
 						"ReferencePrice": null,
-						"Store": "00070",
+						"Store": "00040",
 						"EndDate": null,
 						"PriceNormal": 1.67,
 						"PriceSale": null,
@@ -1044,7 +990,7 @@
 						"StorePrices": [{
 							"StoreIdentifier": {
 								"DivisionId": "615",
-								"StoreId": "00070"
+								"StoreId": "00040"
 							},
 							"CalculatedReferencePrice": null,
 							"MinimumAdvertisedPrice": null,
@@ -1058,7 +1004,7 @@
 						{
 							"StoreIdentifier": {
 								"DivisionId": "672",
-								"StoreId": "00721"
+								"StoreId": "00782"
 							},
 							"CalculatedReferencePrice": null,
 							"MinimumAdvertisedPrice": null,
@@ -1130,7 +1076,7 @@
 						"RegularNFor": "1",
 						"ReferenceNFor": "1",
 						"ReferencePrice": null,
-						"Store": "00070",
+						"Store": "00040",
 						"EndDate": null,
 						"PriceNormal": 0.79,
 						"PriceSale": null,
@@ -1148,7 +1094,7 @@
 						"StorePrices": [{
 							"StoreIdentifier": {
 								"DivisionId": "615",
-								"StoreId": "00070"
+								"StoreId": "00040"
 							},
 							"CalculatedReferencePrice": null,
 							"MinimumAdvertisedPrice": null,
@@ -1162,7 +1108,7 @@
 						{
 							"StoreIdentifier": {
 								"DivisionId": "672",
-								"StoreId": "00721"
+								"StoreId": "00782"
 							},
 							"CalculatedReferencePrice": null,
 							"MinimumAdvertisedPrice": null,
@@ -1294,7 +1240,7 @@
 						"RegularNFor": "1",
 						"ReferenceNFor": "1",
 						"ReferencePrice": null,
-						"Store": "00070",
+						"Store": "00040",
 						"EndDate": null,
 						"PriceNormal": 2.89,
 						"PriceSale": null,
@@ -1317,7 +1263,7 @@
 				//can be used for store returning no products???
 				//{
 				//	"DivisionId": "672",
-				//		"StoreId": "00721"
+				//		"StoreId": "00782"
 				//}
 				;
 
@@ -1675,7 +1621,7 @@
 							"banner": "KWIKSHOP",
 							"vanityName": "Kwik Shop",
 							"divisionNumber": "672",
-							"storeNumber": "00721",
+							"storeNumber": "00782",
 							"phoneNumber": "7857491636",
 							"showWeeklyAd": false,
 							"showShopThisStoreAndPreferredStoreButtons": false,
@@ -1713,7 +1659,7 @@
 							"banner": "DILLONS",
 							"vanityName": "23rd St. Dillons",
 							"divisionNumber": "615",
-							"storeNumber": "00070",
+							"storeNumber": "00040",
 							"phoneNumber": "7858413366",
 							"showWeeklyAd": false,
 							"showShopThisStoreAndPreferredStoreButtons": false,
