@@ -55,10 +55,15 @@
 	</style>
 </head>
 <body>
-
+	<div class="w3-sidebar w3-bar-block" style="display:none" id="mySidebar">
+		<button onclick="w3_close()" class="w3-bar-item w3-button w3-large">Close &times;</button>
+		<a href="#" class="w3-bar-item w3-button">Stores</a>
+		<a href="#" class="w3-bar-item w3-button">Products</a>
+		<a href="#" class="w3-bar-item w3-button">Info</a>
+	</div>
 	<div class="w3-container">
-
-		<h2 class='w3-center'>header text</h2>
+		<button id="hamburger" class="w3-button w3-display-topleft w3-xlarge w3-theme" onclick="w3_open()">☰</button>
+		<h2 class='w3-center'>Price Comparison</h2>
 
 		<label><b>City or Zipcode</b></label>
 		<!-- <div class="w3-bar"> -->
@@ -146,7 +151,7 @@
 				</div>
 			</div>
 		</div>
-		
+
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.3.5/js/swiper.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.19/js/jquery.dataTables.min.js"></script>
@@ -166,7 +171,7 @@
 				let payload = { stores: [], upcs: [] };
 				addStoreSearchBindings();
 				addProductSearchBindings();
-
+				$("#hamburger").on("click", "button", payload, hamburgerBtn);
 				$("#storesSwiper").on("click.storeBtn", "button", payload, storeBtn);
 				$("#productsSwiper").on("click.productBtn", "button", payload, productBtn);
 				$("#getProductComparison").on(comparisonClick, "button", payload, comparisonBtn);
@@ -190,25 +195,29 @@
 
 				});
 
-			
-
-
-
-
-				document.addEventListener('storeAdded', storeAddedHandler);
-				document.addEventListener('productAdded', productAddedHandler);
 
 
 
 
 
+				$(document).on('storeAdded', storeAddedHandler)
+					.on('productAdded', productAddedHandler);
+
+
+
+
+				function hamburgerBtn(e) {
+					
+				}
 
 
 				function storeAddedHandler(e) {
 					if (payload.stores.length === MAX_STORES) {
 						$("#searchProductInput").parent().removeClass('w3-hide');
 					}
+					displayEngine.createMenuStoreOption(e.detail);
 				}
+
 
 				function addStoreSearchBindings() {
 					$("#searchStoreInput").on(storeKeypress, searchStoreFn);
@@ -279,7 +288,7 @@
 
 
 				function comparisonBtn(e) {
-					$("#getProductComparison").off("click.comparisonBtn").find("button").attr("disabled","");
+					$("#getProductComparison").off("click.comparisonBtn").find("button").attr("disabled", "");
 					let comparisonPayload = {
 						"UPCs": Object.keys(payload.upcs),
 						"RequestStoreInfos": payload.stores
@@ -290,7 +299,7 @@
 				}
 
 				function addComparisonBindings() {
-					$("#getProductComparison").on(comparisonClick, "button",  payload, comparisonBtn).find("button").attr("disabled", null);
+					$("#getProductComparison").on(comparisonClick, "button", payload, comparisonBtn).find("button").attr("disabled", null);
 				}
 
 
@@ -314,7 +323,9 @@
 					else {
 						payload.stores.push(storeObj);
 						btn.text("remove store");
-						document.dispatchEvent(new Event('storeAdded'));
+						let storeAddedEvt = $.Event('storeAdded', { 'detail': storeObj });
+						$(document).trigger(storeAddedEvt);
+						//document.dispatchEvent(new Event('storeAdded'));
 					}
 				}
 
@@ -403,17 +414,39 @@
 				})(function () { });
 
 				var displayEngine = (function (engine) {
+
+
+					engine.createMenuProductOption = function (product) {
+
+
+					};
+
+					engine.deleteMenuProductOption = function (product) {
+
+
+					};
+
+					engine.createMenuStoreOption = function (store) {
+						console.log('createmenustoreoption');
+
+					};
+
+					engine.deleteMenuStoreOption = function (store) {
+
+
+					};
+
 					engine.displayComparison = function (comparisonData) {
 						console.log("display comparison");
 						if (comparisonData === undefined) { comparisonData = mockComparisonData; }
 						let storeProducts = comparisonData.ProductStorePrices;
 						let noProductStores = comparisonData.NoProductsReturned;
 						let table = document.createElement("table");
-						
+
 						let tHead = document.createElement("thead");
 						let headRow = document.createElement("tr");
 						headRow.appendChild(document.createElement("th"));
-						
+
 						storeProducts.forEach(function (product) {
 							let th = document.createElement("th");
 							th.innerText = product.Description + " " + product.CustomerFacingSize;
@@ -457,7 +490,7 @@
 						//table.style = "width:100%;";
 						container.appendChild(table);
 						$('#comparison').DataTable({
-							
+
 							searching: false,
 							scrollY: "300px",
 							scrollX: true,
