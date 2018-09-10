@@ -50,7 +50,7 @@
 
 		.w3-sidebar{
 			z-index:2;
-			min-width:200px;
+			min-width:250px;
 			width:unset;
 		}
 
@@ -90,6 +90,7 @@
 
 
 		<div class="w3-row w3-hide">
+			<label><b>Product name or keyword</b></label>
 			<input class="w3-input w3-theme w3-border " name="product" id="searchProductInput" type="text" value="product">
 			<button class="w3-button w3-ripple w3-center fa fa-search w3-block w3-col w3-theme" id="searchProductGo"></button>
 		</div>
@@ -161,12 +162,12 @@
 		</div>
 		<div id="infoMsg" class="w3-modal">
 			<div class="w3-modal-content">
-				<div class="w3-container">
+				<div class="w3-container w3-large">
 					<span onclick="document.getElementById('infoMsg').style.display='none'"
 						  class="w3-button w3-display-topright w3-theme">&times;</span>
 					<h6>Cookies</h6>
 					<p>This site uses cookies for google tracking and page functionality.  
-						You can block Google tracking(and many other ad related scripts) with the <a target="_blank" href="https://github.com/gorhill/uBlock#installation">Ublock Origin</a> browser plugin</p>
+						You can block Google tracking(and many similar scripts) with the <a target="_blank" href="https://github.com/gorhill/uBlock#installation">Ublock Origin</a> browser plugin</p>
 					<h6>Note</h6>
 					<p>Some stores won't have any pricing data available.  Known stores without data: Kwik Shop </p>
 					<h6>Source</h6>
@@ -201,7 +202,10 @@
 				$("#storesSwiper").on("click.storeBtn", "button", payload, storeBtn);
 				$("#productsSwiper").on("click.productBtn", "button", payload, productBtn);
 				$("#getProductComparison").on(comparisonClick, "button", payload, comparisonBtn);
-				$("#infoOption").on("click", function () { $("#infoMsg").show();});
+				$("#infoOption").on("click", function () { $("#infoMsg").show(); });
+
+				$("#selectedStores").on("click", "a", removeStore);
+				$("#selectedProducts").on("click", "a", removeProduct);
 				var mySwiper = new Swiper('#storesSwiper.swiper-container, #productsSwiper.swiper-container', {
 					// Optional parameters
 					//init: false,
@@ -239,6 +243,23 @@
 					$("#mySidebar").hide();
 				}
 
+				function removeStore(e) {
+					let option = $(e.target);
+					let storeObj = {
+						StoreId: option.attr('data-storeId'),
+						DivisionId: option.attr('data-divisionId'),
+						
+					};
+					let indx = undefined;
+					if ((indx = indexOfStore(storeObj)) >= 0) {
+						payload.stores.splice(indx, 1);
+						$("#storesSwiper button[data-storenumber='" + storeObj.StoreId + "'][data-divisionnumber='" + storeObj.DivisionId + "']").text("add store");
+						
+						displayEngine.deleteMenuStoreOption(storeObj);
+					}
+				}
+
+				
 
 				function storeAddedHandler(e) {
 					if (payload.stores.length === MAX_STORES) {
@@ -274,7 +295,17 @@
 				}
 
 
-
+				function removeProduct(e) {
+					console.log('removeProduct');
+					let upc = $(e.target).attr('id');
+					let indx = Object.keys(payload.upcs).indexOf(upc);
+					if (indx > -1) {
+						delete payload.upcs[upc];
+						$("#productsSwiper button[data-upc='" + upc + "']").text('add product');
+						displayEngine.deleteMenuProductOption(upc);
+					}
+					
+				}
 
 				function productAddedHandler(e) {
 					if (Object.keys(payload.upcs).length >= 1 && payload.stores.length >= 1) {
@@ -282,7 +313,15 @@
 					} else {
 						$("#getProductComparison").addClass('w3-hide');
 					}
-
+					let option = $("#" + e.detail.UPC);
+					if (e.detail && option.length > 0) {
+						//remove event
+						displayEngine.deleteMenuProductOption(e.detail.UPC);
+					}
+					else {
+						//add event
+						displayEngine.createMenuProductOption(e.detail);
+					}
 
 				}
 
@@ -355,9 +394,9 @@
 						storeObj.Address = btn.attr("data-address");
 						btn.text("remove store");
 						let storeAddedEvt = $.Event('storeAdded', { 'detail': storeObj });
-						storeAddedEvt.currentTarget = event.target;
+						storeAddedEvt.currentTarget = event.target;// TODO DO I NEED THIS????
 						$(document).trigger(storeAddedEvt);
-						//document.dispatchEvent(new Event('storeAdded'));
+
 					}
 				}
 
@@ -378,12 +417,14 @@
 				function productBtn(event) {
 					let btn = $(event.target);
 					let upc = btn.attr('data-upc');
-
+					let name = btn.attr('data-name');
 					let indx = Object.keys(payload.upcs).indexOf(upc);
 					if (indx > -1) {
+						
+						//let addedEvent = new Event('productAdded');
+						let addedEvent = $.Event('productAdded', { 'detail': { UPC: upc } });
+						$(document).trigger(addedEvent);
 						delete payload.upcs[upc];
-						let addedEvent = new Event('productAdded');
-						document.dispatchEvent(addedEvent);
 						btn.text("add product");
 					}
 					else if (Object.keys(payload.upcs).length >= MAX_PRODUCTS) {
@@ -392,8 +433,8 @@
 					else {
 						payload.upcs[upc] = {};
 						btn.text("remove product");
-
-						document.dispatchEvent(new Event('productAdded'));
+						let addedEvent = $.Event('productAdded', { 'detail': { UPC: upc , Name: name} });
+						$(document).trigger(addedEvent);
 					}
 				}
 
@@ -450,12 +491,15 @@
 					option.className ="w3-bar-item w3-button";
 
 					engine.createMenuProductOption = function (product) {
-						
-
+						let productOption = option.cloneNode();
+						productOption.setAttribute("id", product.UPC);
+						productOption.innerText = product.Name;
+						document.getElementById("selectedProducts").appendChild(productOption);
 					};
 
-					engine.deleteMenuProductOption = function (product) {
-
+					engine.deleteMenuProductOption = function (upc) {
+						let deleteOption = document.getElementById(upc);
+						deleteOption.parentNode.removeChild(deleteOption);
 
 					};
 
@@ -466,7 +510,7 @@
 						storeOption.innerText = store.Name + ": " + store.Address;
 						storeOption.setAttribute("id", store.StoreId + '-' + store.DivisionId);
 						storeOption.setAttribute("data-storeId", store.StoreId);
-						storeOption.setAttribute("data-DivisionId", store.DivisionId);
+						storeOption.setAttribute("data-divisionId", store.DivisionId);
 						document.getElementById("selectedStores").appendChild(storeOption);
 
 					};
@@ -644,6 +688,7 @@
 							containers[2].innerText = product.customerFacingSize;
 							let button = clone.find("button").eq(0);
 							button.attr('data-upc', product.upc);
+							button.attr('data-name', product.description);
 
 							if (Object.keys(payload.upcs).indexOf(product.upc) > -1) {
 								button.text("remove product");
@@ -1710,7 +1755,7 @@
 							"banner": "KWIKSHOP",
 							"vanityName": "Kwik Shop",
 							"divisionNumber": "672",
-							"storeNumber": "00782",
+							"storeNumber": "00783",
 							"phoneNumber": "7857491636",
 							"showWeeklyAd": false,
 							"showShopThisStoreAndPreferredStoreButtons": false,
@@ -2585,11 +2630,11 @@
 
 
 				if (mock) {
-					$("#searchStoreGo").click();
-					$("#storesSwiper button.w3-theme").slice(0, 2).click();
-					$("#searchProductGo").click();
-					$("#productsSwiper button.w3-theme").slice(0, 5).click();
-					$("#getProductComparison button.w3-theme").click();
+					//$("#searchStoreGo").click();
+					//$("#storesSwiper button.w3-theme").slice(0, 2).click();
+					//$("#searchProductGo").click();
+					//$("#productsSwiper button.w3-theme").slice(0, 5).click();
+					//$("#getProductComparison button.w3-theme").click();
 //					$("#hamburger").click();
 				}
 
