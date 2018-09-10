@@ -48,6 +48,12 @@
 			font-size: 70%;
 		}
 
+		.w3-sidebar{
+			z-index:2;
+			min-width:200px;
+			width:unset;
+		}
+
 		/*div.dataTables_wrapper {
 			width: 800px;
 			margin: 0 auto;
@@ -55,14 +61,16 @@
 	</style>
 </head>
 <body>
-	<div class="w3-sidebar w3-bar-block" style="display:none" id="mySidebar">
-		<button onclick="w3_close()" class="w3-bar-item w3-button w3-large">Close &times;</button>
-		<a href="#" class="w3-bar-item w3-button">Stores</a>
-		<a href="#" class="w3-bar-item w3-button">Products</a>
-		<a href="#" class="w3-bar-item w3-button">Info</a>
+	<div class="w3-sidebar w3-bar-block w3-theme" style="display:none" id="mySidebar">
+		<button id="closeMySidebar" class="w3-bar-item w3-button w3-large">Close &times;</button>
+		<div id="storesTitle" class="w3-bar-item ">Stores <span class="w3-right w3-tiny">click a store to remove it</span></div>
+		<div id="selectedStores" class="w3-container "></div>
+		<div class="w3-bar-item ">Products <span class="w3-right w3-tiny">click a product to remove it</span></div>
+		<div id="selectedProducts" class="w3-container "></div>
+		<a id="infoOption" href="#" class="w3-bar-item w3-button">Info</a>
 	</div>
 	<div class="w3-container">
-		<button id="hamburger" class="w3-button w3-display-topleft w3-xlarge w3-theme" onclick="w3_open()">☰</button>
+		<button id="hamburger" class="w3-button w3-display-topleft w3-xlarge w3-theme" >☰</button>
 		<h2 class='w3-center'>Price Comparison</h2>
 
 		<label><b>City or Zipcode</b></label>
@@ -151,6 +159,21 @@
 				</div>
 			</div>
 		</div>
+		<div id="infoMsg" class="w3-modal">
+			<div class="w3-modal-content">
+				<div class="w3-container">
+					<span onclick="document.getElementById('infoMsg').style.display='none'"
+						  class="w3-button w3-display-topright w3-theme">&times;</span>
+					<h6>Cookies</h6>
+					<p>This site uses cookies for google tracking and page functionality.  
+						You can block Google tracking(and many other ad related scripts) with the <a target="_blank" href="https://github.com/gorhill/uBlock#installation">Ublock Origin</a> browser plugin</p>
+					<h6>Note</h6>
+					<p>Some stores won't have any pricing data available.  Known stores without data: Kwik Shop </p>
+					<h6>Source</h6>
+					<p>Source code can be found on <a target="_blank" href="https://github.com/czf/KrogerStoreCompare">GitHub</a></p>
+				</div>
+			</div>
+		</div>
 
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.3.5/js/swiper.min.js"></script>
@@ -171,10 +194,14 @@
 				let payload = { stores: [], upcs: [] };
 				addStoreSearchBindings();
 				addProductSearchBindings();
-				$("#hamburger").on("click", "button", payload, hamburgerBtn);
+				$("#hamburger").on("click", hamburgerBtn);
+				$("#closeMySidebar").on("click", closeSidebar);
+				
+
 				$("#storesSwiper").on("click.storeBtn", "button", payload, storeBtn);
 				$("#productsSwiper").on("click.productBtn", "button", payload, productBtn);
 				$("#getProductComparison").on(comparisonClick, "button", payload, comparisonBtn);
+				$("#infoOption").on("click", function () { $("#infoMsg").show();});
 				var mySwiper = new Swiper('#storesSwiper.swiper-container, #productsSwiper.swiper-container', {
 					// Optional parameters
 					//init: false,
@@ -203,11 +230,13 @@
 				$(document).on('storeAdded', storeAddedHandler)
 					.on('productAdded', productAddedHandler);
 
-
-
-
+			
 				function hamburgerBtn(e) {
-					
+					$("#mySidebar").removeClass("w3-animate-right").addClass("w3-animate-left").show();
+				}
+
+				function closeSidebar(e) {
+					$("#mySidebar").hide();
 				}
 
 
@@ -316,14 +345,17 @@
 					if ((indx = indexOfStore(storeObj)) >= 0) {
 						payload.stores.splice(indx, 1);
 						btn.text("add store");
+						displayEngine.deleteMenuStoreOption(storeObj);
 					}
 					else if (payload.stores.length >= MAX_STORES) {
 						$("#storeLimit").show();
 					}
 					else {
 						payload.stores.push(storeObj);
+						storeObj.Address = btn.attr("data-address");
 						btn.text("remove store");
 						let storeAddedEvt = $.Event('storeAdded', { 'detail': storeObj });
+						storeAddedEvt.currentTarget = event.target;
 						$(document).trigger(storeAddedEvt);
 						//document.dispatchEvent(new Event('storeAdded'));
 					}
@@ -414,10 +446,11 @@
 				})(function () { });
 
 				var displayEngine = (function (engine) {
-
+					let option = document.createElement("a");
+					option.className ="w3-bar-item w3-button";
 
 					engine.createMenuProductOption = function (product) {
-
+						
 
 					};
 
@@ -428,11 +461,19 @@
 
 					engine.createMenuStoreOption = function (store) {
 						console.log('createmenustoreoption');
+						console.log(store);
+						let storeOption = option.cloneNode();
+						storeOption.innerText = store.Name + ": " + store.Address;
+						storeOption.setAttribute("id", store.StoreId + '-' + store.DivisionId);
+						storeOption.setAttribute("data-storeId", store.StoreId);
+						storeOption.setAttribute("data-DivisionId", store.DivisionId);
+						document.getElementById("selectedStores").appendChild(storeOption);
 
 					};
 
 					engine.deleteMenuStoreOption = function (store) {
-
+						let deleteOption = document.getElementById(store.StoreId + "-" + store.DivisionId);
+						deleteOption.parentNode.removeChild(deleteOption);
 
 					};
 
@@ -540,17 +581,19 @@
 							clone.attr('id', null);
 							clone.find("h3")[0].innerText = store.vanityName;
 							let paragraphs = clone.find("p");
-							paragraphs[0].innerText =
+							let addressText = 							
 								store.address.addressLine1 + " " +
 								(!store.address.addressLine2 ? "" : store.address.addressLine2) + " " +
 								store.address.city + " " +
 								store.address.stateCode + " " +
 								store.address.zip;
+							paragraphs[0].innerText = addressText;
 							paragraphs[1].innerText = store.distance + " mi."
 							let button = clone.find("button").eq(0);
 							button.attr("data-name", store.vanityName);
 							button.attr('data-storenumber', store.storeNumber);
 							button.attr('data-divisionnumber', store.divisionNumber)
+							button.attr('data-address', addressText);
 							let storeObj = {
 								StoreId: store.storeNumber,
 								DivisionId: store.divisionNumber
@@ -2547,6 +2590,7 @@
 					$("#searchProductGo").click();
 					$("#productsSwiper button.w3-theme").slice(0, 5).click();
 					$("#getProductComparison button.w3-theme").click();
+//					$("#hamburger").click();
 				}
 
 			}
