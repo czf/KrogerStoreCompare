@@ -10,7 +10,7 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.3.5/css/swiper.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.19/css/jquery.dataTables.min.css" />
 	<link rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/3.2.6/css/fixedColumns.dataTables.min.css" />
-	<!--<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css" />-->
+	
 	<!--
 	 
 		original inspiration 
@@ -22,10 +22,13 @@
 		button, input, a {
 			outline: none;
 		}
+		.w3-modal-content {
+			border: 1px solid white;
+		}
 
-			button.fa-search {
-				font-size: x-large;
-			}
+		button.fa-search {
+			font-size: x-large;
+		}
 
 		.swiper-slide.w3-row {
 			padding-bottom: 37px;
@@ -70,7 +73,7 @@
 		<a id="infoOption" href="#" class="w3-bar-item w3-button">Info</a>
 	</div>
 	<div class="w3-container">
-		<button id="hamburger" class="w3-button w3-display-topleft w3-xlarge w3-theme" >☰</button>
+		<button id="hamburger" class="w3-button w3-display-topleft w3-xlarge w3-theme">☰</button>
 		<h2 class='w3-center'>Price Comparison</h2>
 
 		<label><b>City or Zipcode</b></label>
@@ -144,7 +147,7 @@
 			<div class="w3-modal-content">
 				<div class="w3-container">
 					<span onclick="document.getElementById('storeLimit').style.display='none'"
-						  class="w3-button w3-display-topright w3-theme">&times;</span>
+						  class="w3-xlarge w3-button w3-display-topright w3-theme">&times;</span>
 					<p>You've reached the limit of stores for comparison. </p>
 					<p>You'll need to remove a store before another can be added. </p>
 				</div>
@@ -154,7 +157,7 @@
 			<div class="w3-modal-content">
 				<div class="w3-container">
 					<span onclick="document.getElementById('productLimit').style.display='none'"
-						  class="w3-button w3-display-topright w3-theme">&times;</span>
+						  class="w3-xlarge w3-button w3-display-topright w3-theme">&times;</span>
 					<p>You've reached the limit of products for comparison. </p>
 					<p>You'll need to remove a product before another can be added. </p>
 				</div>
@@ -164,13 +167,15 @@
 			<div class="w3-modal-content">
 				<div class="w3-container w3-large">
 					<span onclick="document.getElementById('infoMsg').style.display='none'"
-						  class="w3-button w3-display-topright w3-theme">&times;</span>
+						  class="w3-xlarge w3-button w3-display-topright w3-theme">&times;</span>
 					<h6>Cookies</h6>
-					<p>This site uses cookies for google tracking and page functionality.  
-						You can block Google tracking(and many similar scripts) with the <a target="_blank" href="https://github.com/gorhill/uBlock#installation">Ublock Origin</a> browser plugin</p>
+					<p>
+						This site uses cookies for google tracking and page functionality.
+						You can block Google tracking(and many similar scripts) with the <a target="_blank" href="https://github.com/gorhill/uBlock#installation">Ublock Origin</a> browser plugin
+					</p>
 					<h6>Note</h6>
 					<p>Some stores won't have any pricing data available.  Known stores without data: Kwik Shop </p>
-					<h6>Source</h6>
+					<h6>Source Code</h6>
 					<p>Source code can be found on <a target="_blank" href="https://github.com/czf/KrogerStoreCompare">GitHub</a></p>
 				</div>
 			</div>
@@ -180,11 +185,12 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.3.5/js/swiper.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.19/js/jquery.dataTables.min.js"></script>
 		<script src="https://cdn.datatables.net/fixedcolumns/3.2.6/js/dataTables.fixedColumns.min.js"></script>
-		<!--<script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>-->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.0/js.cookie.min.js"></script>
 
 		<script>
 			$(readyFn);
 			function readyFn() {
+				const VERSION = 1;
 				const MAX_STORES = 2;
 				const MAX_PRODUCTS = 5;
 				let storeKeypress = "keypress.storeInput";
@@ -197,7 +203,7 @@
 				addProductSearchBindings();
 				$("#hamburger").on("click", hamburgerBtn);
 				$("#closeMySidebar").on("click", closeSidebar);
-				
+
 
 				$("#storesSwiper").on("click.storeBtn", "button", payload, storeBtn);
 				$("#productsSwiper").on("click.productBtn", "button", payload, productBtn);
@@ -206,6 +212,18 @@
 
 				$("#selectedStores").on("click", "a", removeStore);
 				$("#selectedProducts").on("click", "a", removeProduct);
+
+				let versionCookie = Cookies.get('infov' + VERSION);
+				if (!versionCookie) {
+					Cookies.set('infov' + VERSION, 1);
+					$("#infoOption").click();
+				}
+
+				for (let v = 1; v < VERSION; v++) {
+					Cookies.remove("infov" + v);
+				}
+
+
 				var mySwiper = new Swiper('#storesSwiper.swiper-container, #productsSwiper.swiper-container', {
 					// Optional parameters
 					//init: false,
@@ -234,7 +252,7 @@
 				$(document).on('storeAdded', storeAddedHandler)
 					.on('productAdded', productAddedHandler);
 
-			
+
 				function hamburgerBtn(e) {
 					$("#mySidebar").removeClass("w3-animate-right").addClass("w3-animate-left").show();
 				}
@@ -248,18 +266,18 @@
 					let storeObj = {
 						StoreId: option.attr('data-storeId'),
 						DivisionId: option.attr('data-divisionId'),
-						
+
 					};
 					let indx = undefined;
 					if ((indx = indexOfStore(storeObj)) >= 0) {
 						payload.stores.splice(indx, 1);
 						$("#storesSwiper button[data-storenumber='" + storeObj.StoreId + "'][data-divisionnumber='" + storeObj.DivisionId + "']").text("add store");
-						
+
 						displayEngine.deleteMenuStoreOption(storeObj);
 					}
 				}
 
-				
+
 
 				function storeAddedHandler(e) {
 					if (payload.stores.length === MAX_STORES) {
@@ -304,7 +322,7 @@
 						$("#productsSwiper button[data-upc='" + upc + "']").text('add product');
 						displayEngine.deleteMenuProductOption(upc);
 					}
-					
+
 				}
 
 				function productAddedHandler(e) {
@@ -420,8 +438,7 @@
 					let name = btn.attr('data-name');
 					let indx = Object.keys(payload.upcs).indexOf(upc);
 					if (indx > -1) {
-						
-						//let addedEvent = new Event('productAdded');
+
 						let addedEvent = $.Event('productAdded', { 'detail': { UPC: upc } });
 						$(document).trigger(addedEvent);
 						delete payload.upcs[upc];
@@ -433,7 +450,7 @@
 					else {
 						payload.upcs[upc] = {};
 						btn.text("remove product");
-						let addedEvent = $.Event('productAdded', { 'detail': { UPC: upc , Name: name} });
+						let addedEvent = $.Event('productAdded', { 'detail': { UPC: upc, Name: name } });
 						$(document).trigger(addedEvent);
 					}
 				}
@@ -488,7 +505,7 @@
 
 				var displayEngine = (function (engine) {
 					let option = document.createElement("a");
-					option.className ="w3-bar-item w3-button";
+					option.className = "w3-bar-item w3-button";
 
 					engine.createMenuProductOption = function (product) {
 						let productOption = option.cloneNode();
@@ -572,7 +589,7 @@
 						while (container.firstChild) container.removeChild(container.firstChild);
 						table.setAttribute("id", "comparison");
 						table.className = "stripe row-border order-column";
-						//table.style = "width:100%;";
+						
 						container.appendChild(table);
 						$('#comparison').DataTable({
 
@@ -586,19 +603,7 @@
 								rightColumns: 0,
 								heightMatch: 'none'
 							}
-							//responsive: {
-							//	breakpoints: [
-							//		{ name: 'bigdesktop', width: Infinity },
-							//		{ name: 'meddesktop', width: 1480 },
-							//		{ name: 'smalldesktop', width: 1280 },
-							//		{ name: 'medium', width: 1188 },
-							//		{ name: 'tabletl', width: 1024 },
-							//		{ name: 'btwtabllandp', width: 848 },
-							//		{ name: 'tabletp', width: 768 },
-							//		{ name: 'mobilel', width: 480 },
-							//		{ name: 'mobilep', width: 320 }
-							//	]
-							//}
+							
 						});
 
 
@@ -610,7 +615,6 @@
 						console.log('display');
 						if (storeData === undefined) { storeData = mockStoreData; }
 						let stores = storeData.Stores;
-						let storeContainers = [];
 
 						let storeTemplate = $("#storeTemplate");
 						let wrapper = undefined
@@ -625,7 +629,7 @@
 							clone.attr('id', null);
 							clone.find("h3")[0].innerText = store.vanityName;
 							let paragraphs = clone.find("p");
-							let addressText = 							
+							let addressText =
 								store.address.addressLine1 + " " +
 								(!store.address.addressLine2 ? "" : store.address.addressLine2) + " " +
 								store.address.city + " " +
@@ -701,9 +705,6 @@
 						let s = document.querySelector('#productsSwiper').swiper;
 						s.removeAllSlides();
 						s.appendSlide(wrappers.map(function (w) { return w[0] }));
-						//s.slideTo(1);
-
-
 
 					}
 
@@ -2635,7 +2636,7 @@
 					//$("#searchProductGo").click();
 					//$("#productsSwiper button.w3-theme").slice(0, 5).click();
 					//$("#getProductComparison button.w3-theme").click();
-//					$("#hamburger").click();
+					//					$("#hamburger").click();
 				}
 
 			}
