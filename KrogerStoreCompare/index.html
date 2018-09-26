@@ -75,12 +75,12 @@
 	<div class="w3-container">
 		<button id="hamburger" class="w3-button w3-display-topleft w3-xlarge w3-theme">☰</button>
 		<h2 class='w3-center'>Price Comparison</h2>
-
+		Need to add banner when vanity name doesn't contain store name.
 		<label><b>City or Zipcode</b></label>
 		<!-- <div class="w3-bar"> -->
 
 		<div class="w3-row">
-			<input class="w3-input w3-theme w3-border " name="zipcity" id="searchStoreInput" type="text" value="asdf">
+			<input class="w3-input w3-theme w3-border " name="Zipcity" id="searchStoreInput" type="text" value="kansas city">
 			<button class="w3-button w3-ripple w3-center fa fa-search w3-block w3-col w3-theme" id="searchStoreGo"></button>
 		</div>
 		<div id="storesSwiper" class="swiper-container">
@@ -457,6 +457,7 @@
 
 				var apiClient = (function (client) {  //refactor so data is returned as resolve and display is called outside
 					console.log(client);
+
 					client.storeSearch = function (searchText) {
 						let dfd = $.Deferred();
 						console.log('search');
@@ -465,7 +466,12 @@
 							dfd.resolve();
 						}
 						else {
-							$.ajax({
+							$.post({
+								url: '//localhost:7071/api/KrogerCompare/StoreSearch/',
+								data: JSON.stringify({
+									'SearchText': searchText,
+								}),
+								contentType: 'application/json',
 
 							}).done(function (storeData) { displayEngine.displayStores(storeData); dfd.resolve(); });
 						}
@@ -479,8 +485,15 @@
 							displayEngine.displayProductSearchResults(mockProductSearchData);
 							dfd.resolve();
 						} else {
-							$.ajax({
-
+							$.post({
+								url: '//localhost:7071/api/ProductSearch',
+								data: JSON.stringify({
+									'Start': 0,
+									'Count': 24,
+									'Tab': 0,
+									'Query': searchText
+								}),
+								contentType: 'application/json',
 							}).done(function (productData) { displayEngine.displayProductSearchResults(productData); dfd.resolve(); });
 						}
 						return dfd.promise();
@@ -494,7 +507,11 @@
 							dfd.resolve();
 						}
 						else {
-							$.ajax(request).done(
+							$.post({
+								url: '//localhost:7071/api/ProductsDetails',
+								data: JSON.stringify(request),
+								contentType: 'application/json',
+							}).done(
 								function (comparisonData) { displayEngine.displayComparison(comparisonData); dfd.resolve(); });
 						}
 						return dfd.promise();
@@ -569,7 +586,10 @@
 								storeProducts.forEach(function (storeProduct) {
 									storePrice = storeProduct.StorePrices.filter(x => x.StoreIdentifier.DivisionId === store.DivisionId && x.StoreIdentifier.StoreId === store.StoreId)[0];
 									let priceCell = document.createElement("td");
-									if (storePrice.PriceSale) {
+									if (!storePrice) {
+										priceCell.innerText = "N/A";
+									}
+									else if (storePrice.PriceSale) {
 										priceCell.innerText = storePrice.PriceSale + " ";
 										let sPrice = document.createElement("s");
 										sPrice.innerText = storePrice.PriceNormal;
@@ -589,7 +609,7 @@
 						while (container.firstChild) container.removeChild(container.firstChild);
 						table.setAttribute("id", "comparison");
 						table.className = "stripe row-border order-column";
-						
+
 						container.appendChild(table);
 						$('#comparison').DataTable({
 
@@ -603,7 +623,7 @@
 								rightColumns: 0,
 								heightMatch: 'none'
 							}
-							
+
 						});
 
 
@@ -627,24 +647,24 @@
 							}
 							let clone = storeTemplate.clone();
 							clone.attr('id', null);
-							clone.find("h3")[0].innerText = store.vanityName;
+							clone.find("h3")[0].innerText = store.VanityName;
 							let paragraphs = clone.find("p");
 							let addressText =
-								store.address.addressLine1 + " " +
-								(!store.address.addressLine2 ? "" : store.address.addressLine2) + " " +
-								store.address.city + " " +
-								store.address.stateCode + " " +
-								store.address.zip;
+								store.Address.AddressLine1 + " " +
+								(!store.Address.AddressLine2 ? "" : store.Address.AddressLine2) + " " +
+								store.Address.City + " " +
+								store.Address.StateCode + " " +
+								store.Address.Zip;
 							paragraphs[0].innerText = addressText;
-							paragraphs[1].innerText = store.distance + " mi."
+							paragraphs[1].innerText = store.Distance + " mi."
 							let button = clone.find("button").eq(0);
-							button.attr("data-name", store.vanityName);
-							button.attr('data-storenumber', store.storeNumber);
-							button.attr('data-divisionnumber', store.divisionNumber)
+							button.attr("data-name", store.VanityName);
+							button.attr('data-storenumber', store.StoreNumber);
+							button.attr('data-divisionnumber', store.DivisionNumber)
 							button.attr('data-address', addressText);
 							let storeObj = {
-								StoreId: store.storeNumber,
-								DivisionId: store.divisionNumber
+								StoreId: store.StoreNumber,
+								DivisionId: store.DivisionNumber
 							};
 							if (indexOfStore(storeObj) > -1) {
 								button.text("remove store");
@@ -680,21 +700,21 @@
 							clone.find("img")[0].src = product.mainImage;
 							let smallImgIndx = indexOfSmallImage(product);
 							let smallImage = undefined;
-							if (smallImgIndx === -1) { smallImage = product.mainImage; }
-							else { smallImage = product.images[smallImgIndx].url; }
+							if (smallImgIndx === -1) { smallImage = product.MainImage; }
+							else { smallImage = product.Images[smallImgIndx].Url; }
 
 							let sources = clone.find("source");
-							sources[0].srcset = product.mainImage;
+							sources[0].srcset = product.MainImage;
 							sources[1].srcset = smallImage
 							let containers = clone.find("div.w3-container");
-							containers[1].innerText = product.description;
+							containers[1].innerText = product.Description;
 
-							containers[2].innerText = product.customerFacingSize;
+							containers[2].innerText = product.CustomerFacingSize;
 							let button = clone.find("button").eq(0);
-							button.attr('data-upc', product.upc);
-							button.attr('data-name', product.description);
+							button.attr('data-upc', product.UPC);
+							button.attr('data-name', product.Description);
 
-							if (Object.keys(payload.upcs).indexOf(product.upc) > -1) {
+							if (Object.keys(payload.upcs).indexOf(product.UPC) > -1) {
 								button.text("remove product");
 							}
 
@@ -712,9 +732,9 @@
 				})(function () { });
 
 				function indexOfSmallImage(product) {
-					return (product.images.findIndex(
+					return (product.Images.findIndex(
 						function (image) {
-							return image.size === 'small' && image.perspective === 'front';
+							return image.Size === 'small' && image.Perspective === 'front';
 						}
 					));
 				}
@@ -726,7 +746,7 @@
 						params.success(response);
 					};
 				}
-				var mock = true;
+				var mock = false;
 
 				var mockComparisonData = {
 					"ProductStorePrices": [{
@@ -1403,1228 +1423,937 @@
 				;
 
 				var mockStoreData = {
-					Stores: [
-						{
-							"banner": "KWIKSHOP",
-							"vanityName": "Kwik Shop",
-							"divisionNumber": "672",
-							"storeNumber": "00782",
-							"phoneNumber": "9137823856",
-							"showWeeklyAd": false,
-							"showShopThisStoreAndPreferredStoreButtons": false,
-							"distance": 16.623327255249023,
-							"latitude": "38.944175",
-							"longitude": "-94.815236",
-							"address": {
-								"addressLine1": "10111 Woodland Road",
-								"addressLine2": null,
-								"city": "Lenexa",
-								"countryCode": "US",
-								"stateCode": "KS",
-								"zip": "66220"
-							},
-							"pharmacy": null,
-							"departments": [{
-								"code": "55"
-							}, {
-								"code": "44"
-							}, {
-								"code": "95"
-							}, {
-								"code": "10"
-							}, {
-								"code": "9999"
-							}, {
-								"code": "78"
-							}, {
-								"code": "86"
-							}, {
-								"code": "60"
-							}, {
-								"code": "89"
-							}
-							],
-							"fulfillmentMethods": {
-								"hasPickup": false,
-								"hasDelivery": false
-							}
+					Stores: [{
+						"Banner": "KWIKSHOP",
+						"VanityName": "Kwik Shop",
+						"DivisionNumber": "672",
+						"StoreNumber": "00782",
+						"PhoneNumber": "9137823856",
+						"ShowWeeklyAd": false,
+						"ShowShopThisStoreAndPreferredStoreButtons": false,
+						"Distance": 16.623327255249,
+						"Latitude": 38.944175,
+						"Longitude": -94.815236,
+						"Address": {
+							"AddressLine1": "10111 Woodland Road",
+							"AddressLine2": null,
+							"City": "Lenexa",
+							"CountryCode": "US",
+							"StateCode": "KS",
+							"Zip": "66220"
+						},
+						"Pharmacy": null,
+						"Departments": [{
+							"Code": "55"
 						}, {
-							"banner": "DILLONS",
-							"vanityName": "Leavenworth Dillons",
-							"divisionNumber": "615",
-							"storeNumber": "00040",
-							"phoneNumber": "9132503500",
-							"showWeeklyAd": false,
-							"showShopThisStoreAndPreferredStoreButtons": false,
-							"distance": 21.322420120239258,
-							"latitude": "39.2679367",
-							"longitude": "-94.9200065",
-							"address": {
-								"addressLine1": "720 Eisenhower Rd",
-								"addressLine2": null,
-								"city": "Leavenworth",
-								"countryCode": "US",
-								"stateCode": "KS",
-								"zip": "66048"
-							},
-							"pharmacy": {
-								"phoneNumber": "9132503504"
-							},
-							"departments": [{
-								"code": "02"
-							}, {
-								"code": "44"
-							}, {
-								"code": "53"
-							}, {
-								"code": "99"
-							}, {
-								"code": "03"
-							}, {
-								"code": "31"
-							}, {
-								"code": "01"
-							}, {
-								"code": "95"
-							}, {
-								"code": "16"
-							}, {
-								"code": "23"
-							}, {
-								"code": "08"
-							}, {
-								"code": "10"
-							}, {
-								"code": "9999"
-							}, {
-								"code": "04"
-							}, {
-								"code": "65"
-							}, {
-								"code": "32"
-							}, {
-								"code": "50"
-							}, {
-								"code": "69"
-							}, {
-								"code": "09"
-							}, {
-								"code": "22"
-							}, {
-								"code": "60"
-							}, {
-								"code": "07"
-							}, {
-								"code": "30"
-							}, {
-								"code": "05"
-							}, {
-								"code": "21"
-							}, {
-								"code": "46"
-							}, {
-								"code": "89"
-							}
-							],
-							"fulfillmentMethods": {
-								"hasPickup": false,
-								"hasDelivery": false
-							}
+							"Code": "44"
 						}, {
-							"banner": "KWIKSHOP",
-							"vanityName": "Kwik Shop",
-							"divisionNumber": "672",
-							"storeNumber": "00783",
-							"phoneNumber": "7855423805",
-							"showWeeklyAd": false,
-							"showShopThisStoreAndPreferredStoreButtons": false,
-							"distance": 29.88580894470215,
-							"latitude": "38.933899",
-							"longitude": "-95.095308",
-							"address": {
-								"addressLine1": "1436 Church St",
-								"addressLine2": null,
-								"city": "Eudora",
-								"countryCode": "US",
-								"stateCode": "KS",
-								"zip": "66025"
-							},
-							"pharmacy": null,
-							"departments": [{
-								"code": "55"
-							}, {
-								"code": "44"
-							}, {
-								"code": "95"
-							}, {
-								"code": "10"
-							}, {
-								"code": "9999"
-							}, {
-								"code": "86"
-							}, {
-								"code": "60"
-							}, {
-								"code": "90"
-							}, {
-								"code": "89"
-							}
-							],
-							"fulfillmentMethods": {
-								"hasPickup": false,
-								"hasDelivery": false
-							}
+							"Code": "95"
 						}, {
-							"banner": "KWIKSHOP",
-							"vanityName": "Kwik Shop",
-							"divisionNumber": "672",
-							"storeNumber": "00785",
-							"phoneNumber": "7858431091",
-							"showWeeklyAd": false,
-							"showShopThisStoreAndPreferredStoreButtons": false,
-							"distance": 35.706424713134766,
-							"latitude": "38.9422",
-							"longitude": "-95.215125",
-							"address": {
-								"addressLine1": "1611 E 23Rd St",
-								"addressLine2": null,
-								"city": "Lawrence",
-								"countryCode": "US",
-								"stateCode": "KS",
-								"zip": "66046"
-							},
-							"pharmacy": null,
-							"departments": [{
-								"code": "55"
-							}, {
-								"code": "44"
-							}, {
-								"code": "95"
-							}, {
-								"code": "10"
-							}, {
-								"code": "9999"
-							}, {
-								"code": "86"
-							}, {
-								"code": "60"
-							}, {
-								"code": "90"
-							}, {
-								"code": "89"
-							}
-							],
-							"fulfillmentMethods": {
-								"hasPickup": false,
-								"hasDelivery": false
-							}
+							"Code": "10"
 						}, {
-							"banner": "DILLONS",
-							"vanityName": "Dapper Dillons",
-							"divisionNumber": "615",
-							"storeNumber": "00098",
-							"phoneNumber": "7858422942",
-							"showWeeklyAd": false,
-							"showShopThisStoreAndPreferredStoreButtons": false,
-							"distance": 36.53745651245117,
-							"latitude": "38.9518574",
-							"longitude": "-95.2352949",
-							"address": {
-								"addressLine1": "1740 Massachusetts Ave.",
-								"addressLine2": null,
-								"city": "Lawrence",
-								"countryCode": "US",
-								"stateCode": "KS",
-								"zip": "66044"
-							},
-							"pharmacy": {
-								"phoneNumber": "7858422434"
-							},
-							"departments": [{
-								"code": "55"
-							}, {
-								"code": "02"
-							}, {
-								"code": "17"
-							}, {
-								"code": "44"
-							}, {
-								"code": "53"
-							}, {
-								"code": "99"
-							}, {
-								"code": "03"
-							}, {
-								"code": "40"
-							}, {
-								"code": "31"
-							}, {
-								"code": "01"
-							}, {
-								"code": "16"
-							}, {
-								"code": "23"
-							}, {
-								"code": "29"
-							}, {
-								"code": "08"
-							}, {
-								"code": "58"
-							}, {
-								"code": "9999"
-							}, {
-								"code": "63"
-							}, {
-								"code": "26"
-							}, {
-								"code": "04"
-							}, {
-								"code": "65"
-							}, {
-								"code": "50"
-							}, {
-								"code": "69"
-							}, {
-								"code": "09"
-							}, {
-								"code": "60"
-							}, {
-								"code": "07"
-							}, {
-								"code": "30"
-							}, {
-								"code": "05"
-							}, {
-								"code": "21"
-							}, {
-								"code": "48"
-							}, {
-								"code": "46"
-							}, {
-								"code": "89"
-							}
-							],
-							"fulfillmentMethods": {
-								"hasPickup": false,
-								"hasDelivery": false
-							}
+							"Code": "9999"
 						}, {
-							"banner": "KWIKSHOP",
-							"vanityName": "Kwik Shop",
-							"divisionNumber": "672",
-							"storeNumber": "00702",
-							"phoneNumber": "7858425536",
-							"showWeeklyAd": false,
-							"showShopThisStoreAndPreferredStoreButtons": false,
-							"distance": 36.566986083984375,
-							"latitude": "38.950411",
-							"longitude": "-95.235303",
-							"address": {
-								"addressLine1": "1846 Massachusetts St",
-								"addressLine2": null,
-								"city": "Lawrence",
-								"countryCode": "US",
-								"stateCode": "KS",
-								"zip": "66044"
-							},
-							"pharmacy": null,
-							"departments": [{
-								"code": "55"
-							}, {
-								"code": "44"
-							}, {
-								"code": "95"
-							}, {
-								"code": "10"
-							}, {
-								"code": "9999"
-							}, {
-								"code": "86"
-							}, {
-								"code": "60"
-							}, {
-								"code": "90"
-							}, {
-								"code": "89"
-							}
-							],
-							"fulfillmentMethods": {
-								"hasPickup": false,
-								"hasDelivery": false
-							}
+							"Code": "78"
 						}, {
-							"banner": "KWIKSHOP",
-							"vanityName": "Kwik Shop",
-							"divisionNumber": "672",
-							"storeNumber": "00783",
-							"phoneNumber": "7857491636",
-							"showWeeklyAd": false,
-							"showShopThisStoreAndPreferredStoreButtons": false,
-							"distance": 36.711238861083984,
-							"latitude": "38.967827",
-							"longitude": "-95.24452",
-							"address": {
-								"addressLine1": "845 Mississippi St",
-								"addressLine2": null,
-								"city": "Lawrence",
-								"countryCode": "US",
-								"stateCode": "KS",
-								"zip": "66044"
-							},
-							"pharmacy": null,
-							"departments": [{
-								"code": "55"
-							}, {
-								"code": "44"
-							}, {
-								"code": "10"
-							}, {
-								"code": "9999"
-							}, {
-								"code": "86"
-							}, {
-								"code": "89"
-							}
-							],
-							"fulfillmentMethods": {
-								"hasPickup": false,
-								"hasDelivery": false
-							}
+							"Code": "86"
 						}, {
-							"banner": "DILLONS",
-							"vanityName": "23rd St. Dillons",
-							"divisionNumber": "615",
-							"storeNumber": "00040",
-							"phoneNumber": "7858413366",
-							"showWeeklyAd": false,
-							"showShopThisStoreAndPreferredStoreButtons": false,
-							"distance": 37.41682434082031,
-							"latitude": "38.9420659",
-							"longitude": "-95.2485283",
-							"address": {
-								"addressLine1": "1015 W 23Rd St",
-								"addressLine2": null,
-								"city": "Lawrence",
-								"countryCode": "US",
-								"stateCode": "KS",
-								"zip": "66046"
-							},
-							"pharmacy": {
-								"phoneNumber": "7858415110"
-							},
-							"departments": [{
-								"code": "55"
-							}, {
-								"code": "02"
-							}, {
-								"code": "11"
-							}, {
-								"code": "44"
-							}, {
-								"code": "53"
-							}, {
-								"code": "99"
-							}, {
-								"code": "03"
-							}, {
-								"code": "54"
-							}, {
-								"code": "31"
-							}, {
-								"code": "01"
-							}, {
-								"code": "23"
-							}, {
-								"code": "73"
-							}, {
-								"code": "08"
-							}, {
-								"code": "9999"
-							}, {
-								"code": "63"
-							}, {
-								"code": "26"
-							}, {
-								"code": "04"
-							}, {
-								"code": "65"
-							}, {
-								"code": "32"
-							}, {
-								"code": "50"
-							}, {
-								"code": "69"
-							}, {
-								"code": "09"
-							}, {
-								"code": "22"
-							}, {
-								"code": "60"
-							}, {
-								"code": "07"
-							}, {
-								"code": "30"
-							}, {
-								"code": "05"
-							}, {
-								"code": "21"
-							}, {
-								"code": "48"
-							}, {
-								"code": "46"
-							}, {
-								"code": "89"
-							}
-							],
-							"fulfillmentMethods": {
-								"hasPickup": false,
-								"hasDelivery": false
-							}
+							"Code": "60"
+						}, {
+							"Code": "89"
 						}
+						],
+						"FulfillmentMethods": {
+							"HasPickup": false,
+							"HasDelivery": false
+						}
+					}, {
+						"Banner": "DILLONS",
+						"VanityName": "Leavenworth Dillons",
+						"DivisionNumber": "615",
+						"StoreNumber": "00040",
+						"PhoneNumber": "9132503500",
+						"ShowWeeklyAd": false,
+						"ShowShopThisStoreAndPreferredStoreButtons": false,
+						"Distance": 21.3224201202393,
+						"Latitude": 39.2679367,
+						"Longitude": -94.9200065,
+						"Address": {
+							"AddressLine1": "720 Eisenhower Rd",
+							"AddressLine2": null,
+							"City": "Leavenworth",
+							"CountryCode": "US",
+							"StateCode": "KS",
+							"Zip": "66048"
+						},
+						"Pharmacy": {
+							"phoneNumber": []
+						},
+						"Departments": [{
+							"Code": "02"
+						}, {
+							"Code": "44"
+						}, {
+							"Code": "53"
+						}, {
+							"Code": "99"
+						}, {
+							"Code": "03"
+						}, {
+							"Code": "31"
+						}, {
+							"Code": "01"
+						}, {
+							"Code": "95"
+						}, {
+							"Code": "16"
+						}, {
+							"Code": "23"
+						}, {
+							"Code": "08"
+						}, {
+							"Code": "10"
+						}, {
+							"Code": "9999"
+						}, {
+							"Code": "04"
+						}, {
+							"Code": "65"
+						}, {
+							"Code": "32"
+						}, {
+							"Code": "50"
+						}, {
+							"Code": "69"
+						}, {
+							"Code": "09"
+						}, {
+							"Code": "94"
+						}, {
+							"Code": "22"
+						}, {
+							"Code": "60"
+						}, {
+							"Code": "07"
+						}, {
+							"Code": "30"
+						}, {
+							"Code": "05"
+						}, {
+							"Code": "21"
+						}, {
+							"Code": "46"
+						}, {
+							"Code": "89"
+						}
+						],
+						"FulfillmentMethods": {
+							"HasPickup": true,
+							"HasDelivery": false
+						}
+					},
+					{
+						"Banner": "DILLONS",
+						"VanityName": "Dapper Dillons",
+						"DivisionNumber": "615",
+						"StoreNumber": "00098",
+						"PhoneNumber": "7858422942",
+						"ShowWeeklyAd": false,
+						"ShowShopThisStoreAndPreferredStoreButtons": false,
+						"Distance": 36.5374565124512,
+						"Latitude": 38.9518574,
+						"Longitude": -95.2352949,
+						"Address": {
+							"AddressLine1": "1740 Massachusetts Ave.",
+							"AddressLine2": null,
+							"City": "Lawrence",
+							"CountryCode": "US",
+							"StateCode": "KS",
+							"Zip": "66044"
+						},
+						"Pharmacy": {
+							"phoneNumber": []
+						},
+						"Departments": [{
+							"Code": "55"
+						}, {
+							"Code": "02"
+						}, {
+							"Code": "17"
+						}, {
+							"Code": "44"
+						}, {
+							"Code": "53"
+						}, {
+							"Code": "99"
+						}, {
+							"Code": "03"
+						}, {
+							"Code": "40"
+						}, {
+							"Code": "31"
+						}, {
+							"Code": "01"
+						}, {
+							"Code": "16"
+						}, {
+							"Code": "23"
+						}, {
+							"Code": "29"
+						}, {
+							"Code": "08"
+						}, {
+							"Code": "58"
+						}, {
+							"Code": "9999"
+						}, {
+							"Code": "63"
+						}, {
+							"Code": "26"
+						}, {
+							"Code": "04"
+						}, {
+							"Code": "65"
+						}, {
+							"Code": "50"
+						}, {
+							"Code": "69"
+						}, {
+							"Code": "09"
+						}, {
+							"Code": "60"
+						}, {
+							"Code": "07"
+						}, {
+							"Code": "30"
+						}, {
+							"Code": "05"
+						}, {
+							"Code": "21"
+						}, {
+							"Code": "48"
+						}, {
+							"Code": "46"
+						}, {
+							"Code": "89"
+						}
+						],
+						"FulfillmentMethods": {
+							"HasPickup": false,
+							"HasDelivery": false
+						}
+					},
 
 					]
 				}
 				var mockProductSearchData =
 				{
+
 					Products: [{
-						"brandName": "Campbell's",
-						"clickListItem": false,
-						"countryOfOrigin": null,
-						"customerFacingSize": "10.75 oz",
-						"description": "Campbell's Cream of Chicken Soup",
-						"forceSize": null,
-						"homeDeliveryItem": false,
-						"images": [{
-							"url": "https://www.kroger.com/product/images/medium/front/0005100001031",
-							"perspective": "front",
-							"size": "medium"
+						"BrandName": "Campbell's",
+						"ClickListItem": false,
+						"CountryOfOrigin": null,
+						"CustomerFacingSize": "10.75 oz",
+						"Description": "Campbell's Cream of Chicken Soup",
+						"ForceSize": null,
+						"HomeDeliveryItem": false,
+						"Images": [{
+							"Url": "https://www.kroger.com/product/images/large/front/0005100001031",
+							"Perspective": "front",
+							"Size": "large"
 						}, {
-							"url": "https://www.kroger.com/product/images/small/front/0005100001031",
-							"perspective": "front",
-							"size": "small"
+							"Url": "https://www.kroger.com/product/images/small/front/0005100001031",
+							"Perspective": "front",
+							"Size": "small"
 						}, {
-							"url": "https://www.kroger.com/product/images/large/front/0005100001031",
-							"perspective": "front",
-							"size": "large"
+							"Url": "https://www.kroger.com/product/images/medium/front/0005100001031",
+							"Perspective": "front",
+							"Size": "medium"
 						}, {
-							"url": "https://www.kroger.com/product/images/xlarge/front/0005100001031",
-							"perspective": "front",
-							"size": "xlarge"
+							"Url": "https://www.kroger.com/product/images/xlarge/front/0005100001031",
+							"Perspective": "front",
+							"Size": "xlarge"
 						}, {
-							"url": "https://www.kroger.com/product/images/thumbnail/front/0005100001031",
-							"perspective": "front",
-							"size": "thumbnail"
+							"Url": "https://www.kroger.com/product/images/thumbnail/front/0005100001031",
+							"Perspective": "front",
+							"Size": "thumbnail"
 						}
 						],
-						"mainImagePerspective": "front",
-						"multipackItem": false,
-						"multipackQuantity": "0",
+						"MainImagePerspective": "front",
+						"MultipackItem": false,
+						"MultipackQuantity": 0,
 						"options": [],
-						"romanceDescription": null,
-						"seoDescription": "campbell-s-cream-of-chicken-soup",
-						"serviceCounter": null,
-						"shipToHomeItem": false,
-						"soldInStore": false,
-						"temperatureIndicator": "Ambient",
-						"verified": true,
-						"mainImage": "https://www.kroger.com/product/images/medium/front/0005100001031",
-						"slug": "campbell-s-cream-of-chicken-soup",
-						"categories": [{
-							"name": "Canned & Packaged",
-							"code": "12",
-							"categoryCode": "12",
-							"categoryName": "Canned & Packaged",
-							"category": "Canned & Packaged"
+						"RomanceDescription": null,
+						"SeoDescription": "campbell-s-cream-of-chicken-soup",
+						"ServiceCounter": null,
+						"ShipToHomeItem": false,
+						"SoldInStore": false,
+						"TemperatureIndicator": "Ambient",
+						"Verified": true,
+						"MainImage": "https://www.kroger.com/product/images/medium/front/0005100001031",
+						"Slug": "campbell-s-cream-of-chicken-soup",
+						"Categories": [{
+							"Name": "Canned & Packaged",
+							"Code": "12",
+							"CategoryCode": "12",
+							"CategoryName": "Canned & Packaged",
+							"Category": "Canned & Packaged"
 						}
 						],
-						"calculatedPromoPrice": null,
-						"calculatedRegularPrice": null,
-						"calculatedReferencePrice": null,
-						"displayTemplate": null,
-						"division": null,
-						"minimumAdvertisedPrice": null,
-						"orderBy": null,
-						"regularNFor": null,
-						"referenceNFor": null,
-						"referencePrice": null,
-						"store": null,
-						"endDate": null,
-						"priceNormal": null,
-						"priceSale": null,
-						"promoDescription": null,
-						"promoType": null,
-						"soldBy": null,
-						"promoNfor": null,
-						"complementProductIds": null,
-						"upc": "0005100001031",
-						"couponId": null,
-						"offers": [],
-						"couponIds": [],
-						"monetizationInfo": null,
-						"hasPrice": false,
-						"loyalMember": false,
-						"primaryIndex": 1,
-						"curbsidePickupEligible": false
+						"CalculatedPromoPrice": null,
+						"CalculatedRegularPrice": null,
+						"CalculatedReferencePrice": null,
+						"DisplayTemplate": null,
+						"Division": null,
+						"MinimumAdvertisedPrice": null,
+						"OrderBy": null,
+						"RegularNFor": null,
+						"ReferenceNFor": null,
+						"ReferencePrice": null,
+						"Store": null,
+						"EndDate": null,
+						"PriceNormal": null,
+						"PriceSale": null,
+						"PromoDescription": null,
+						"PromoType": null,
+						"UPC": "0005100001031",
+						"CouponId": null,
+						"Offers": [],
+						"CouponIds": [],
+						"HasPrice": false,
+						"LoyalMember": false,
+						"PrimaryIndex": "1",
+						"CurbsidePickupEligible": false
 					}, {
-						"brandName": "Campbell's",
-						"clickListItem": false,
-						"countryOfOrigin": null,
-						"customerFacingSize": "10.5 oz",
-						"description": "Campbell's 99% Fat Free Cream of Chicken Soup",
-						"forceSize": null,
-						"homeDeliveryItem": false,
-						"images": [{
-							"url": "https://www.kroger.com/product/images/thumbnail/front/0005100011553",
-							"perspective": "front",
-							"size": "thumbnail"
+						"BrandName": "Campbell's",
+						"ClickListItem": false,
+						"CountryOfOrigin": null,
+						"CustomerFacingSize": "10.5 oz",
+						"Description": "Campbell's 99% Fat Free Cream of Chicken Soup",
+						"ForceSize": null,
+						"HomeDeliveryItem": false,
+						"Images": [{
+							"Url": "https://www.kroger.com/product/images/medium/front/0005100011553",
+							"Perspective": "front",
+							"Size": "medium"
 						}, {
-							"url": "https://www.kroger.com/product/images/small/front/0005100011553",
-							"perspective": "front",
-							"size": "small"
+							"Url": "https://www.kroger.com/product/images/thumbnail/left/0005100011553",
+							"Perspective": "left",
+							"Size": "thumbnail"
 						}, {
-							"url": "https://www.kroger.com/product/images/xlarge/front/0005100011553",
-							"perspective": "front",
-							"size": "xlarge"
+							"Url": "https://www.kroger.com/product/images/small/left/0005100011553",
+							"Perspective": "left",
+							"Size": "small"
 						}, {
-							"url": "https://www.kroger.com/product/images/large/front/0005100011553",
-							"perspective": "front",
-							"size": "large"
+							"Url": "https://www.kroger.com/product/images/small/back/0005100011553",
+							"Perspective": "back",
+							"Size": "small"
 						}, {
-							"url": "https://www.kroger.com/product/images/thumbnail/back/0005100011553",
-							"perspective": "back",
-							"size": "thumbnail"
+							"Url": "https://www.kroger.com/product/images/large/front/0005100011553",
+							"Perspective": "front",
+							"Size": "large"
 						}, {
-							"url": "https://www.kroger.com/product/images/medium/front/0005100011553",
-							"perspective": "front",
-							"size": "medium"
+							"Url": "https://www.kroger.com/product/images/large/left/0005100011553",
+							"Perspective": "left",
+							"Size": "large"
 						}, {
-							"url": "https://www.kroger.com/product/images/medium/left/0005100011553",
-							"perspective": "left",
-							"size": "medium"
+							"Url": "https://www.kroger.com/product/images/xlarge/left/0005100011553",
+							"Perspective": "left",
+							"Size": "xlarge"
 						}, {
-							"url": "https://www.kroger.com/product/images/small/back/0005100011553",
-							"perspective": "back",
-							"size": "small"
+							"Url": "https://www.kroger.com/product/images/small/front/0005100011553",
+							"Perspective": "front",
+							"Size": "small"
 						}, {
-							"url": "https://www.kroger.com/product/images/large/left/0005100011553",
-							"perspective": "left",
-							"size": "large"
+							"Url": "https://www.kroger.com/product/images/thumbnail/front/0005100011553",
+							"Perspective": "front",
+							"Size": "thumbnail"
 						}, {
-							"url": "https://www.kroger.com/product/images/medium/back/0005100011553",
-							"perspective": "back",
-							"size": "medium"
+							"Url": "https://www.kroger.com/product/images/large/back/0005100011553",
+							"Perspective": "back",
+							"Size": "large"
 						}, {
-							"url": "https://www.kroger.com/product/images/large/back/0005100011553",
-							"perspective": "back",
-							"size": "large"
+							"Url": "https://www.kroger.com/product/images/xlarge/back/0005100011553",
+							"Perspective": "back",
+							"Size": "xlarge"
 						}, {
-							"url": "https://www.kroger.com/product/images/xlarge/back/0005100011553",
-							"perspective": "back",
-							"size": "xlarge"
+							"Url": "https://www.kroger.com/product/images/thumbnail/back/0005100011553",
+							"Perspective": "back",
+							"Size": "thumbnail"
 						}, {
-							"url": "https://www.kroger.com/product/images/xlarge/left/0005100011553",
-							"perspective": "left",
-							"size": "xlarge"
+							"Url": "https://www.kroger.com/product/images/xlarge/front/0005100011553",
+							"Perspective": "front",
+							"Size": "xlarge"
 						}, {
-							"url": "https://www.kroger.com/product/images/small/left/0005100011553",
-							"perspective": "left",
-							"size": "small"
+							"Url": "https://www.kroger.com/product/images/medium/back/0005100011553",
+							"Perspective": "back",
+							"Size": "medium"
 						}, {
-							"url": "https://www.kroger.com/product/images/thumbnail/left/0005100011553",
-							"perspective": "left",
-							"size": "thumbnail"
+							"Url": "https://www.kroger.com/product/images/medium/left/0005100011553",
+							"Perspective": "left",
+							"Size": "medium"
 						}
 						],
-						"mainImagePerspective": "front",
-						"multipackItem": false,
-						"multipackQuantity": "0",
+						"MainImagePerspective": "front",
+						"MultipackItem": false,
+						"MultipackQuantity": 0,
 						"options": [],
-						"romanceDescription": null,
-						"seoDescription": "campbell-s-99-fat-free-cream-of-chicken-soup",
-						"serviceCounter": null,
-						"shipToHomeItem": false,
-						"soldInStore": false,
-						"temperatureIndicator": "Ambient",
-						"verified": true,
-						"mainImage": "https://www.kroger.com/product/images/medium/front/0005100011553",
-						"slug": "campbell-s-99-fat-free-cream-of-chicken-soup",
-						"categories": [{
-							"name": "Canned & Packaged",
-							"code": "12",
-							"categoryCode": "12",
-							"categoryName": "Canned & Packaged",
-							"category": "Canned & Packaged"
+						"RomanceDescription": null,
+						"SeoDescription": "campbell-s-99-fat-free-cream-of-chicken-soup",
+						"ServiceCounter": null,
+						"ShipToHomeItem": false,
+						"SoldInStore": false,
+						"TemperatureIndicator": "Ambient",
+						"Verified": true,
+						"MainImage": "https://www.kroger.com/product/images/medium/front/0005100011553",
+						"Slug": "campbell-s-99-fat-free-cream-of-chicken-soup",
+						"Categories": [{
+							"Name": "Canned & Packaged",
+							"Code": "12",
+							"CategoryCode": "12",
+							"CategoryName": "Canned & Packaged",
+							"Category": "Canned & Packaged"
 						}
 						],
-						"calculatedPromoPrice": null,
-						"calculatedRegularPrice": null,
-						"calculatedReferencePrice": null,
-						"displayTemplate": null,
-						"division": null,
-						"minimumAdvertisedPrice": null,
-						"orderBy": null,
-						"regularNFor": null,
-						"referenceNFor": null,
-						"referencePrice": null,
-						"store": null,
-						"endDate": null,
-						"priceNormal": null,
-						"priceSale": null,
-						"promoDescription": null,
-						"promoType": null,
-						"soldBy": null,
-						"promoNfor": null,
-						"complementProductIds": null,
-						"upc": "0005100011553",
-						"couponId": null,
-						"offers": [],
-						"couponIds": [],
-						"monetizationInfo": null,
-						"hasPrice": false,
-						"loyalMember": false,
-						"primaryIndex": 2,
-						"curbsidePickupEligible": false
+						"CalculatedPromoPrice": null,
+						"CalculatedRegularPrice": null,
+						"CalculatedReferencePrice": null,
+						"DisplayTemplate": null,
+						"Division": null,
+						"MinimumAdvertisedPrice": null,
+						"OrderBy": null,
+						"RegularNFor": null,
+						"ReferenceNFor": null,
+						"ReferencePrice": null,
+						"Store": null,
+						"EndDate": null,
+						"PriceNormal": null,
+						"PriceSale": null,
+						"PromoDescription": null,
+						"PromoType": null,
+						"UPC": "0005100011553",
+						"CouponId": null,
+						"Offers": [],
+						"CouponIds": [],
+						"HasPrice": false,
+						"LoyalMember": false,
+						"PrimaryIndex": "2",
+						"CurbsidePickupEligible": false
 					}, {
-						"brandName": "Kroger",
-						"clickListItem": false,
-						"countryOfOrigin": null,
-						"customerFacingSize": "10.5 oz",
-						"description": "Kroger Cream of Chicken Soup - Reduced Sodium",
-						"forceSize": null,
-						"homeDeliveryItem": false,
-						"images": [{
-							"url": "https://www.kroger.com/product/images/xlarge/front/0001111087191",
-							"perspective": "front",
-							"size": "xlarge"
+						"BrandName": "Kroger",
+						"ClickListItem": false,
+						"CountryOfOrigin": null,
+						"CustomerFacingSize": "10.5 oz",
+						"Description": "Kroger Cream of Chicken Soup - Reduced Sodium",
+						"ForceSize": null,
+						"HomeDeliveryItem": false,
+						"Images": [{
+							"Url": "https://www.kroger.com/product/images/small/front/0001111087191",
+							"Perspective": "front",
+							"Size": "small"
 						}, {
-							"url": "https://www.kroger.com/product/images/medium/front/0001111087191",
-							"perspective": "front",
-							"size": "medium"
+							"Url": "https://www.kroger.com/product/images/large/front/0001111087191",
+							"Perspective": "front",
+							"Size": "large"
 						}, {
-							"url": "https://www.kroger.com/product/images/small/front/0001111087191",
-							"perspective": "front",
-							"size": "small"
+							"Url": "https://www.kroger.com/product/images/thumbnail/front/0001111087191",
+							"Perspective": "front",
+							"Size": "thumbnail"
 						}, {
-							"url": "https://www.kroger.com/product/images/thumbnail/front/0001111087191",
-							"perspective": "front",
-							"size": "thumbnail"
+							"Url": "https://www.kroger.com/product/images/medium/front/0001111087191",
+							"Perspective": "front",
+							"Size": "medium"
 						}, {
-							"url": "https://www.kroger.com/product/images/large/front/0001111087191",
-							"perspective": "front",
-							"size": "large"
+							"Url": "https://www.kroger.com/product/images/xlarge/front/0001111087191",
+							"Perspective": "front",
+							"Size": "xlarge"
 						}
 						],
-						"mainImagePerspective": "front",
-						"multipackItem": false,
-						"multipackQuantity": "0",
+						"MainImagePerspective": "front",
+						"MultipackItem": false,
+						"MultipackQuantity": 0,
 						"options": [],
-						"romanceDescription": null,
-						"seoDescription": "kroger-cream-of-chicken-soup-reduced-sodium",
-						"serviceCounter": null,
-						"shipToHomeItem": false,
-						"soldInStore": false,
-						"temperatureIndicator": "Ambient",
-						"verified": true,
-						"mainImage": "https://www.kroger.com/product/images/medium/front/0001111087191",
-						"slug": "kroger-cream-of-chicken-soup-reduced-sodium",
-						"categories": [{
-							"name": "Canned & Packaged",
-							"code": "12",
-							"categoryCode": "12",
-							"categoryName": "Canned & Packaged",
-							"category": "Canned & Packaged"
+						"RomanceDescription": null,
+						"SeoDescription": "kroger-cream-of-chicken-soup-reduced-sodium",
+						"ServiceCounter": null,
+						"ShipToHomeItem": false,
+						"SoldInStore": false,
+						"TemperatureIndicator": "Ambient",
+						"Verified": true,
+						"MainImage": "https://www.kroger.com/product/images/medium/front/0001111087191",
+						"Slug": "kroger-cream-of-chicken-soup-reduced-sodium",
+						"Categories": [{
+							"Name": "Canned & Packaged",
+							"Code": "12",
+							"CategoryCode": "12",
+							"CategoryName": "Canned & Packaged",
+							"Category": "Canned & Packaged"
 						}
 						],
-						"calculatedPromoPrice": null,
-						"calculatedRegularPrice": null,
-						"calculatedReferencePrice": null,
-						"displayTemplate": null,
-						"division": null,
-						"minimumAdvertisedPrice": null,
-						"orderBy": null,
-						"regularNFor": null,
-						"referenceNFor": null,
-						"referencePrice": null,
-						"store": null,
-						"endDate": null,
-						"priceNormal": null,
-						"priceSale": null,
-						"promoDescription": null,
-						"promoType": null,
-						"soldBy": null,
-						"promoNfor": null,
-						"complementProductIds": null,
-						"upc": "0001111087191",
-						"couponId": null,
-						"offers": [],
-						"couponIds": [],
-						"monetizationInfo": null,
-						"hasPrice": false,
-						"loyalMember": false,
-						"primaryIndex": 3,
-						"curbsidePickupEligible": false
+						"CalculatedPromoPrice": null,
+						"CalculatedRegularPrice": null,
+						"CalculatedReferencePrice": null,
+						"DisplayTemplate": null,
+						"Division": null,
+						"MinimumAdvertisedPrice": null,
+						"OrderBy": null,
+						"RegularNFor": null,
+						"ReferenceNFor": null,
+						"ReferencePrice": null,
+						"Store": null,
+						"EndDate": null,
+						"PriceNormal": null,
+						"PriceSale": null,
+						"PromoDescription": null,
+						"PromoType": null,
+						"UPC": "0001111087191",
+						"CouponId": null,
+						"Offers": [],
+						"CouponIds": [],
+						"HasPrice": false,
+						"LoyalMember": false,
+						"PrimaryIndex": "3",
+						"CurbsidePickupEligible": false
 					}, {
-						"brandName": "Campbell's",
-						"clickListItem": false,
-						"countryOfOrigin": null,
-						"customerFacingSize": "26 oz",
-						"description": "Campbell's Family Size Condensed Cream of Chicken Soup",
-						"forceSize": null,
-						"homeDeliveryItem": false,
-						"images": [{
-							"url": "https://www.kroger.com/product/images/small/left/0005100021243",
-							"perspective": "left",
-							"size": "small"
+						"BrandName": "Campbell's",
+						"ClickListItem": false,
+						"CountryOfOrigin": null,
+						"CustomerFacingSize": "26 oz",
+						"Description": "Campbell's Family Size Condensed Cream of Chicken Soup",
+						"ForceSize": null,
+						"HomeDeliveryItem": false,
+						"Images": [{
+							"Url": "https://www.kroger.com/product/images/medium/front/0005100021243",
+							"Perspective": "front",
+							"Size": "medium"
 						}, {
-							"url": "https://www.kroger.com/product/images/thumbnail/right/0005100021243",
-							"perspective": "right",
-							"size": "thumbnail"
+							"Url": "https://www.kroger.com/product/images/xlarge/right/0005100021243",
+							"Perspective": "right",
+							"Size": "xlarge"
 						}, {
-							"url": "https://www.kroger.com/product/images/medium/front/0005100021243",
-							"perspective": "front",
-							"size": "medium"
+							"Url": "https://www.kroger.com/product/images/xlarge/back/0005100021243",
+							"Perspective": "back",
+							"Size": "xlarge"
 						}, {
-							"url": "https://www.kroger.com/product/images/thumbnail/back/0005100021243",
-							"perspective": "back",
-							"size": "thumbnail"
+							"Url": "https://www.kroger.com/product/images/xlarge/left/0005100021243",
+							"Perspective": "left",
+							"Size": "xlarge"
 						}, {
-							"url": "https://www.kroger.com/product/images/xlarge/back/0005100021243",
-							"perspective": "back",
-							"size": "xlarge"
+							"Url": "https://www.kroger.com/product/images/thumbnail/front/0005100021243",
+							"Perspective": "front",
+							"Size": "thumbnail"
 						}, {
-							"url": "https://www.kroger.com/product/images/large/right/0005100021243",
-							"perspective": "right",
-							"size": "large"
+							"Url": "https://www.kroger.com/product/images/thumbnail/right/0005100021243",
+							"Perspective": "right",
+							"Size": "thumbnail"
 						}, {
-							"url": "https://www.kroger.com/product/images/small/front/0005100021243",
-							"perspective": "front",
-							"size": "small"
+							"Url": "https://www.kroger.com/product/images/large/right/0005100021243",
+							"Perspective": "right",
+							"Size": "large"
 						}, {
-							"url": "https://www.kroger.com/product/images/medium/back/0005100021243",
-							"perspective": "back",
-							"size": "medium"
+							"Url": "https://www.kroger.com/product/images/medium/back/0005100021243",
+							"Perspective": "back",
+							"Size": "medium"
 						}, {
-							"url": "https://www.kroger.com/product/images/large/front/0005100021243",
-							"perspective": "front",
-							"size": "large"
+							"Url": "https://www.kroger.com/product/images/medium/right/0005100021243",
+							"Perspective": "right",
+							"Size": "medium"
 						}, {
-							"url": "https://www.kroger.com/product/images/large/back/0005100021243",
-							"perspective": "back",
-							"size": "large"
+							"Url": "https://www.kroger.com/product/images/large/back/0005100021243",
+							"Perspective": "back",
+							"Size": "large"
 						}, {
-							"url": "https://www.kroger.com/product/images/medium/right/0005100021243",
-							"perspective": "right",
-							"size": "medium"
+							"Url": "https://www.kroger.com/product/images/small/left/0005100021243",
+							"Perspective": "left",
+							"Size": "small"
 						}, {
-							"url": "https://www.kroger.com/product/images/small/right/0005100021243",
-							"perspective": "right",
-							"size": "small"
+							"Url": "https://www.kroger.com/product/images/medium/left/0005100021243",
+							"Perspective": "left",
+							"Size": "medium"
 						}, {
-							"url": "https://www.kroger.com/product/images/small/back/0005100021243",
-							"perspective": "back",
-							"size": "small"
+							"Url": "https://www.kroger.com/product/images/thumbnail/left/0005100021243",
+							"Perspective": "left",
+							"Size": "thumbnail"
 						}, {
-							"url": "https://www.kroger.com/product/images/thumbnail/front/0005100021243",
-							"perspective": "front",
-							"size": "thumbnail"
+							"Url": "https://www.kroger.com/product/images/thumbnail/back/0005100021243",
+							"Perspective": "back",
+							"Size": "thumbnail"
 						}, {
-							"url": "https://www.kroger.com/product/images/xlarge/left/0005100021243",
-							"perspective": "left",
-							"size": "xlarge"
+							"Url": "https://www.kroger.com/product/images/small/right/0005100021243",
+							"Perspective": "right",
+							"Size": "small"
 						}, {
-							"url": "https://www.kroger.com/product/images/large/left/0005100021243",
-							"perspective": "left",
-							"size": "large"
+							"Url": "https://www.kroger.com/product/images/large/front/0005100021243",
+							"Perspective": "front",
+							"Size": "large"
 						}, {
-							"url": "https://www.kroger.com/product/images/medium/left/0005100021243",
-							"perspective": "left",
-							"size": "medium"
+							"Url": "https://www.kroger.com/product/images/small/front/0005100021243",
+							"Perspective": "front",
+							"Size": "small"
 						}, {
-							"url": "https://www.kroger.com/product/images/thumbnail/left/0005100021243",
-							"perspective": "left",
-							"size": "thumbnail"
+							"Url": "https://www.kroger.com/product/images/large/left/0005100021243",
+							"Perspective": "left",
+							"Size": "large"
 						}, {
-							"url": "https://www.kroger.com/product/images/xlarge/front/0005100021243",
-							"perspective": "front",
-							"size": "xlarge"
+							"Url": "https://www.kroger.com/product/images/xlarge/front/0005100021243",
+							"Perspective": "front",
+							"Size": "xlarge"
 						}, {
-							"url": "https://www.kroger.com/product/images/xlarge/right/0005100021243",
-							"perspective": "right",
-							"size": "xlarge"
+							"Url": "https://www.kroger.com/product/images/small/back/0005100021243",
+							"Perspective": "back",
+							"Size": "small"
 						}
 						],
-						"mainImagePerspective": "front",
-						"multipackItem": false,
-						"multipackQuantity": "0",
+						"MainImagePerspective": "front",
+						"MultipackItem": false,
+						"MultipackQuantity": 0,
 						"options": [],
-						"romanceDescription": null,
-						"seoDescription": "campbell-s-family-size-condensed-cream-of-chicken-soup",
-						"serviceCounter": null,
-						"shipToHomeItem": false,
-						"soldInStore": false,
-						"temperatureIndicator": "Ambient",
-						"verified": true,
-						"mainImage": "https://www.kroger.com/product/images/medium/front/0005100021243",
-						"slug": "campbell-s-family-size-condensed-cream-of-chicken-soup",
-						"categories": [{
-							"name": "Canned & Packaged",
-							"code": "12",
-							"categoryCode": "12",
-							"categoryName": "Canned & Packaged",
-							"category": "Canned & Packaged"
+						"RomanceDescription": null,
+						"SeoDescription": "campbell-s-family-size-condensed-cream-of-chicken-soup",
+						"ServiceCounter": null,
+						"ShipToHomeItem": false,
+						"SoldInStore": false,
+						"TemperatureIndicator": "Ambient",
+						"Verified": true,
+						"MainImage": "https://www.kroger.com/product/images/medium/front/0005100021243",
+						"Slug": "campbell-s-family-size-condensed-cream-of-chicken-soup",
+						"Categories": [{
+							"Name": "Canned & Packaged",
+							"Code": "12",
+							"CategoryCode": "12",
+							"CategoryName": "Canned & Packaged",
+							"Category": "Canned & Packaged"
 						}
 						],
-						"calculatedPromoPrice": null,
-						"calculatedRegularPrice": null,
-						"calculatedReferencePrice": null,
-						"displayTemplate": null,
-						"division": null,
-						"minimumAdvertisedPrice": null,
-						"orderBy": null,
-						"regularNFor": null,
-						"referenceNFor": null,
-						"referencePrice": null,
-						"store": null,
-						"endDate": null,
-						"priceNormal": null,
-						"priceSale": null,
-						"promoDescription": null,
-						"promoType": null,
-						"soldBy": null,
-						"promoNfor": null,
-						"complementProductIds": null,
-						"upc": "0005100021243",
-						"couponId": null,
-						"offers": [],
-						"couponIds": [],
-						"monetizationInfo": null,
-						"hasPrice": false,
-						"loyalMember": false,
-						"primaryIndex": 4,
-						"curbsidePickupEligible": false
+						"CalculatedPromoPrice": null,
+						"CalculatedRegularPrice": null,
+						"CalculatedReferencePrice": null,
+						"DisplayTemplate": null,
+						"Division": null,
+						"MinimumAdvertisedPrice": null,
+						"OrderBy": null,
+						"RegularNFor": null,
+						"ReferenceNFor": null,
+						"ReferencePrice": null,
+						"Store": null,
+						"EndDate": null,
+						"PriceNormal": null,
+						"PriceSale": null,
+						"PromoDescription": null,
+						"PromoType": null,
+						"UPC": "0005100021243",
+						"CouponId": null,
+						"Offers": [],
+						"CouponIds": [],
+						"HasPrice": false,
+						"LoyalMember": false,
+						"PrimaryIndex": "4",
+						"CurbsidePickupEligible": false
 					}, {
-						"brandName": "Simple Truth Organic",
-						"clickListItem": false,
-						"countryOfOrigin": null,
-						"customerFacingSize": "10.5 oz",
-						"description": "Simple Truth Organic Cream of Chicken Soup",
-						"forceSize": null,
-						"homeDeliveryItem": false,
-						"images": [{
-							"url": "https://www.kroger.com/product/images/medium/front/0001111088973",
-							"perspective": "front",
-							"size": "medium"
+						"BrandName": "Kroger",
+						"ClickListItem": false,
+						"CountryOfOrigin": null,
+						"CustomerFacingSize": "10.5 oz",
+						"Description": "Kroger 98% Fat Free Condensed Cream of Chicken Soup",
+						"ForceSize": null,
+						"HomeDeliveryItem": false,
+						"Images": [{
+							"Url": "https://www.kroger.com/product/images/xlarge/front/0001111083714",
+							"Perspective": "front",
+							"Size": "xlarge"
 						}, {
-							"url": "https://www.kroger.com/product/images/xlarge/front/0001111088973",
-							"perspective": "front",
-							"size": "xlarge"
+							"Url": "https://www.kroger.com/product/images/large/front/0001111083714",
+							"Perspective": "front",
+							"Size": "large"
 						}, {
-							"url": "https://www.kroger.com/product/images/small/front/0001111088973",
-							"perspective": "front",
-							"size": "small"
+							"Url": "https://www.kroger.com/product/images/medium/front/0001111083714",
+							"Perspective": "front",
+							"Size": "medium"
 						}, {
-							"url": "https://www.kroger.com/product/images/large/front/0001111088973",
-							"perspective": "front",
-							"size": "large"
+							"Url": "https://www.kroger.com/product/images/small/front/0001111083714",
+							"Perspective": "front",
+							"Size": "small"
 						}, {
-							"url": "https://www.kroger.com/product/images/thumbnail/front/0001111088973",
-							"perspective": "front",
-							"size": "thumbnail"
+							"Url": "https://www.kroger.com/product/images/thumbnail/front/0001111083714",
+							"Perspective": "front",
+							"Size": "thumbnail"
 						}
 						],
-						"mainImagePerspective": "front",
-						"multipackItem": false,
-						"multipackQuantity": "0",
+						"MainImagePerspective": "front",
+						"MultipackItem": false,
+						"MultipackQuantity": 0,
 						"options": [],
-						"romanceDescription": null,
-						"seoDescription": "simple-truth-organic-cream-of-chicken-soup",
-						"serviceCounter": null,
-						"shipToHomeItem": false,
-						"soldInStore": false,
-						"temperatureIndicator": "Ambient",
-						"verified": true,
-						"mainImage": "https://www.kroger.com/product/images/medium/front/0001111088973",
-						"slug": "simple-truth-organic-cream-of-chicken-soup",
-						"categories": [{
-							"name": "Natural & Organic",
-							"code": "73",
-							"categoryCode": "73",
-							"categoryName": "Natural & Organic",
-							"category": "Natural & Organic"
-						}, {
-							"name": "Canned & Packaged",
-							"code": "12",
-							"categoryCode": "12",
-							"categoryName": "Canned & Packaged",
-							"category": "Canned & Packaged"
+						"RomanceDescription": null,
+						"SeoDescription": "kroger-98-fat-free-condensed-cream-of-chicken-soup",
+						"ServiceCounter": null,
+						"ShipToHomeItem": false,
+						"SoldInStore": false,
+						"TemperatureIndicator": "Ambient",
+						"Verified": true,
+						"MainImage": "https://www.kroger.com/product/images/medium/front/0001111083714",
+						"Slug": "kroger-98-fat-free-condensed-cream-of-chicken-soup",
+						"Categories": [{
+							"Name": "Canned & Packaged",
+							"Code": "12",
+							"CategoryCode": "12",
+							"CategoryName": "Canned & Packaged",
+							"Category": "Canned & Packaged"
 						}
 						],
-						"calculatedPromoPrice": null,
-						"calculatedRegularPrice": null,
-						"calculatedReferencePrice": null,
-						"displayTemplate": null,
-						"division": null,
-						"minimumAdvertisedPrice": null,
-						"orderBy": null,
-						"regularNFor": null,
-						"referenceNFor": null,
-						"referencePrice": null,
-						"store": null,
-						"endDate": null,
-						"priceNormal": null,
-						"priceSale": null,
-						"promoDescription": null,
-						"promoType": null,
-						"soldBy": null,
-						"promoNfor": null,
-						"complementProductIds": null,
-						"upc": "0001111088973",
-						"couponId": null,
-						"offers": [],
-						"couponIds": [],
-						"monetizationInfo": null,
-						"hasPrice": false,
-						"loyalMember": false,
-						"primaryIndex": 5,
-						"curbsidePickupEligible": false
+						"CalculatedPromoPrice": null,
+						"CalculatedRegularPrice": null,
+						"CalculatedReferencePrice": null,
+						"DisplayTemplate": null,
+						"Division": null,
+						"MinimumAdvertisedPrice": null,
+						"OrderBy": null,
+						"RegularNFor": null,
+						"ReferenceNFor": null,
+						"ReferencePrice": null,
+						"Store": null,
+						"EndDate": null,
+						"PriceNormal": null,
+						"PriceSale": null,
+						"PromoDescription": null,
+						"PromoType": null,
+						"UPC": "0001111083714",
+						"CouponId": null,
+						"Offers": [],
+						"CouponIds": [],
+						"HasPrice": false,
+						"LoyalMember": false,
+						"PrimaryIndex": "5",
+						"CurbsidePickupEligible": false
 					}, {
-						"brandName": "Campbell's",
-						"clickListItem": false,
-						"countryOfOrigin": null,
-						"customerFacingSize": "18.8 oz",
-						"description": "Campbell's Chunky Savory Chicken Soup With White & Wild Rice",
-						"forceSize": null,
-						"homeDeliveryItem": false,
-						"images": [{
-							"url": "https://www.kroger.com/product/images/thumbnail/left/0005100000562",
-							"perspective": "left",
-							"size": "thumbnail"
+						"BrandName": "Campbell's",
+						"ClickListItem": false,
+						"CountryOfOrigin": null,
+						"CustomerFacingSize": "18.8 oz",
+						"Description": "Campbell's Chunky Savory Chicken Soup With White & Wild Rice",
+						"ForceSize": null,
+						"HomeDeliveryItem": false,
+						"Images": [{
+							"Url": "https://www.kroger.com/product/images/thumbnail/left/0005100000562",
+							"Perspective": "left",
+							"Size": "thumbnail"
 						}, {
-							"url": "https://www.kroger.com/product/images/large/left/0005100000562",
-							"perspective": "left",
-							"size": "large"
+							"Url": "https://www.kroger.com/product/images/medium/front/0005100000562",
+							"Perspective": "front",
+							"Size": "medium"
 						}, {
-							"url": "https://www.kroger.com/product/images/medium/right/0005100000562",
-							"perspective": "right",
-							"size": "medium"
+							"Url": "https://www.kroger.com/product/images/large/front/0005100000562",
+							"Perspective": "front",
+							"Size": "large"
 						}, {
-							"url": "https://www.kroger.com/product/images/xlarge/right/0005100000562",
-							"perspective": "right",
-							"size": "xlarge"
+							"Url": "https://www.kroger.com/product/images/xlarge/left/0005100000562",
+							"Perspective": "left",
+							"Size": "xlarge"
 						}, {
-							"url": "https://www.kroger.com/product/images/thumbnail/front/0005100000562",
-							"perspective": "front",
-							"size": "thumbnail"
+							"Url": "https://www.kroger.com/product/images/large/right/0005100000562",
+							"Perspective": "right",
+							"Size": "large"
 						}, {
-							"url": "https://www.kroger.com/product/images/small/right/0005100000562",
-							"perspective": "right",
-							"size": "small"
+							"Url": "https://www.kroger.com/product/images/thumbnail/front/0005100000562",
+							"Perspective": "front",
+							"Size": "thumbnail"
 						}, {
-							"url": "https://www.kroger.com/product/images/thumbnail/right/0005100000562",
-							"perspective": "right",
-							"size": "thumbnail"
+							"Url": "https://www.kroger.com/product/images/small/front/0005100000562",
+							"Perspective": "front",
+							"Size": "small"
 						}, {
-							"url": "https://www.kroger.com/product/images/large/front/0005100000562",
-							"perspective": "front",
-							"size": "large"
+							"Url": "https://www.kroger.com/product/images/xlarge/right/0005100000562",
+							"Perspective": "right",
+							"Size": "xlarge"
 						}, {
-							"url": "https://www.kroger.com/product/images/medium/front/0005100000562",
-							"perspective": "front",
-							"size": "medium"
+							"Url": "https://www.kroger.com/product/images/small/right/0005100000562",
+							"Perspective": "right",
+							"Size": "small"
 						}, {
-							"url": "https://www.kroger.com/product/images/xlarge/left/0005100000562",
-							"perspective": "left",
-							"size": "xlarge"
+							"Url": "https://www.kroger.com/product/images/large/left/0005100000562",
+							"Perspective": "left",
+							"Size": "large"
 						}, {
-							"url": "https://www.kroger.com/product/images/medium/left/0005100000562",
-							"perspective": "left",
-							"size": "medium"
+							"Url": "https://www.kroger.com/product/images/small/left/0005100000562",
+							"Perspective": "left",
+							"Size": "small"
 						}, {
-							"url": "https://www.kroger.com/product/images/large/right/0005100000562",
-							"perspective": "right",
-							"size": "large"
+							"Url": "https://www.kroger.com/product/images/xlarge/front/0005100000562",
+							"Perspective": "front",
+							"Size": "xlarge"
 						}, {
-							"url": "https://www.kroger.com/product/images/small/front/0005100000562",
-							"perspective": "front",
-							"size": "small"
+							"Url": "https://www.kroger.com/product/images/medium/left/0005100000562",
+							"Perspective": "left",
+							"Size": "medium"
 						}, {
-							"url": "https://www.kroger.com/product/images/xlarge/front/0005100000562",
-							"perspective": "front",
-							"size": "xlarge"
+							"Url": "https://www.kroger.com/product/images/medium/right/0005100000562",
+							"Perspective": "right",
+							"Size": "medium"
 						}, {
-							"url": "https://www.kroger.com/product/images/small/left/0005100000562",
-							"perspective": "left",
-							"size": "small"
+							"Url": "https://www.kroger.com/product/images/thumbnail/right/0005100000562",
+							"Perspective": "right",
+							"Size": "thumbnail"
 						}
 						],
-						"mainImagePerspective": "front",
-						"multipackItem": false,
-						"multipackQuantity": "0",
+						"MainImagePerspective": "front",
+						"MultipackItem": false,
+						"MultipackQuantity": 0,
 						"options": [],
-						"romanceDescription": null,
-						"seoDescription": "campbell-s-chunky-savory-chicken-soup-with-white-wild-rice",
-						"serviceCounter": null,
-						"shipToHomeItem": false,
-						"soldInStore": false,
-						"temperatureIndicator": "Ambient",
-						"verified": true,
-						"mainImage": "https://www.kroger.com/product/images/medium/front/0005100000562",
-						"slug": "campbell-s-chunky-savory-chicken-soup-with-white-wild-rice",
-						"categories": [{
-							"name": "Canned & Packaged",
-							"code": "12",
-							"categoryCode": "12",
-							"categoryName": "Canned & Packaged",
-							"category": "Canned & Packaged"
+						"RomanceDescription": null,
+						"SeoDescription": "campbell-s-chunky-savory-chicken-soup-with-white-wild-rice",
+						"ServiceCounter": null,
+						"ShipToHomeItem": false,
+						"SoldInStore": false,
+						"TemperatureIndicator": "Ambient",
+						"Verified": true,
+						"MainImage": "https://www.kroger.com/product/images/medium/front/0005100000562",
+						"Slug": "campbell-s-chunky-savory-chicken-soup-with-white-wild-rice",
+						"Categories": [{
+							"Name": "Canned & Packaged",
+							"Code": "12",
+							"CategoryCode": "12",
+							"CategoryName": "Canned & Packaged",
+							"Category": "Canned & Packaged"
 						}
 						],
-						"calculatedPromoPrice": null,
-						"calculatedRegularPrice": null,
-						"calculatedReferencePrice": null,
-						"displayTemplate": null,
-						"division": null,
-						"minimumAdvertisedPrice": null,
-						"orderBy": null,
-						"regularNFor": null,
-						"referenceNFor": null,
-						"referencePrice": null,
-						"store": null,
-						"endDate": null,
-						"priceNormal": null,
-						"priceSale": null,
-						"promoDescription": null,
-						"promoType": null,
-						"soldBy": null,
-						"promoNfor": null,
-						"complementProductIds": null,
-						"upc": "0005100000562",
-						"couponId": null,
-						"offers": [],
-						"couponIds": [],
-						"monetizationInfo": null,
-						"hasPrice": false,
-						"loyalMember": false,
-						"primaryIndex": 6,
-						"curbsidePickupEligible": false
+						"CalculatedPromoPrice": null,
+						"CalculatedRegularPrice": null,
+						"CalculatedReferencePrice": null,
+						"DisplayTemplate": null,
+						"Division": null,
+						"MinimumAdvertisedPrice": null,
+						"OrderBy": null,
+						"RegularNFor": null,
+						"ReferenceNFor": null,
+						"ReferencePrice": null,
+						"Store": null,
+						"EndDate": null,
+						"PriceNormal": null,
+						"PriceSale": null,
+						"PromoDescription": null,
+						"PromoType": null,
+						"UPC": "0005100000562",
+						"CouponId": null,
+						"Offers": [],
+						"CouponIds": [],
+						"HasPrice": false,
+						"LoyalMember": false,
+						"PrimaryIndex": "6",
+						"CurbsidePickupEligible": false
 					}, {
-						"brandName": "Progresso",
-						"clickListItem": false,
-						"countryOfOrigin": null,
-						"customerFacingSize": "18.5 oz",
-						"description": "Progresso Light Zesty! Santa Fe Style Chicken Soup",
-						"forceSize": null,
-						"homeDeliveryItem": false,
-						"images": [{
-							"url": "https://www.kroger.com/product/images/small/right/0004119640483",
-							"perspective": "right",
-							"size": "small"
+						"BrandName": "Progresso",
+						"ClickListItem": false,
+						"CountryOfOrigin": null,
+						"CustomerFacingSize": "18.5 oz",
+						"Description": "Progresso Light Zesty! Santa Fe Style Chicken Soup",
+						"ForceSize": null,
+						"HomeDeliveryItem": false,
+						"Images": [{
+							"Url": "https://www.kroger.com/product/images/large/front/0004119640483",
+							"Perspective": "front",
+							"Size": "large"
 						}, {
-							"url": "https://www.kroger.com/product/images/xlarge/left/0004119640483",
-							"perspective": "left",
-							"size": "xlarge"
+							"Url": "https://www.kroger.com/product/images/small/front/0004119640483",
+							"Perspective": "front",
+							"Size": "small"
 						}, {
-							"url": "https://www.kroger.com/product/images/small/left/0004119640483",
-							"perspective": "left",
-							"size": "small"
+							"Url": "https://www.kroger.com/product/images/thumbnail/front/0004119640483",
+							"Perspective": "front",
+							"Size": "thumbnail"
 						}, {
-							"url": "https://www.kroger.com/product/images/large/front/0004119640483",
-							"perspective": "front",
-							"size": "large"
+							"Url": "https://www.kroger.com/product/images/medium/left/0004119640483",
+							"Perspective": "left",
+							"Size": "medium"
 						}, {
-							"url": "https://www.kroger.com/product/images/large/left/0004119640483",
-							"perspective": "left",
-							"size": "large"
+							"Url": "https://www.kroger.com/product/images/large/left/0004119640483",
+							"Perspective": "left",
+							"Size": "large"
 						}, {
-							"url": "https://www.kroger.com/product/images/thumbnail/right/0004119640483",
-							"perspective": "right",
-							"size": "thumbnail"
+							"Url": "https://www.kroger.com/product/images/thumbnail/right/0004119640483",
+							"Perspective": "right",
+							"Size": "thumbnail"
 						}, {
-							"url": "https://www.kroger.com/product/images/medium/front/0004119640483",
-							"perspective": "front",
-							"size": "medium"
+							"Url": "https://www.kroger.com/product/images/medium/front/0004119640483",
+							"Perspective": "front",
+							"Size": "medium"
 						}, {
-							"url": "https://www.kroger.com/product/images/thumbnail/left/0004119640483",
-							"perspective": "left",
-							"size": "thumbnail"
+							"Url": "https://www.kroger.com/product/images/large/right/0004119640483",
+							"Perspective": "right",
+							"Size": "large"
 						}, {
-							"url": "https://www.kroger.com/product/images/large/right/0004119640483",
-							"perspective": "right",
-							"size": "large"
+							"Url": "https://www.kroger.com/product/images/medium/right/0004119640483",
+							"Perspective": "right",
+							"Size": "medium"
 						}, {
-							"url": "https://www.kroger.com/product/images/medium/left/0004119640483",
-							"perspective": "left",
-							"size": "medium"
+							"Url": "https://www.kroger.com/product/images/xlarge/right/0004119640483",
+							"Perspective": "right",
+							"Size": "xlarge"
 						}, {
-							"url": "https://www.kroger.com/product/images/small/front/0004119640483",
-							"perspective": "front",
-							"size": "small"
+							"Url": "https://www.kroger.com/product/images/thumbnail/left/0004119640483",
+							"Perspective": "left",
+							"Size": "thumbnail"
 						}, {
-							"url": "https://www.kroger.com/product/images/thumbnail/front/0004119640483",
-							"perspective": "front",
-							"size": "thumbnail"
+							"Url": "https://www.kroger.com/product/images/small/left/0004119640483",
+							"Perspective": "left",
+							"Size": "small"
 						}, {
-							"url": "https://www.kroger.com/product/images/xlarge/right/0004119640483",
-							"perspective": "right",
-							"size": "xlarge"
+							"Url": "https://www.kroger.com/product/images/small/right/0004119640483",
+							"Perspective": "right",
+							"Size": "small"
 						}, {
-							"url": "https://www.kroger.com/product/images/medium/right/0004119640483",
-							"perspective": "right",
-							"size": "medium"
+							"Url": "https://www.kroger.com/product/images/xlarge/left/0004119640483",
+							"Perspective": "left",
+							"Size": "xlarge"
 						}, {
-							"url": "https://www.kroger.com/product/images/xlarge/front/0004119640483",
-							"perspective": "front",
-							"size": "xlarge"
+							"Url": "https://www.kroger.com/product/images/xlarge/front/0004119640483",
+							"Perspective": "front",
+							"Size": "xlarge"
 						}
 						],
-						"mainImagePerspective": "front",
-						"multipackItem": false,
-						"multipackQuantity": "0",
+						"MainImagePerspective": "front",
+						"MultipackItem": false,
+						"MultipackQuantity": 0,
 						"options": [],
-						"romanceDescription": null,
-						"seoDescription": "progresso-light-zesty-santa-fe-style-chicken-soup",
-						"serviceCounter": null,
-						"shipToHomeItem": false,
-						"soldInStore": false,
-						"temperatureIndicator": "Ambient",
-						"verified": true,
-						"mainImage": "https://www.kroger.com/product/images/medium/front/0004119640483",
-						"slug": "progresso-light-zesty-santa-fe-style-chicken-soup",
-						"categories": [{
-							"name": "Canned & Packaged",
-							"code": "12",
-							"categoryCode": "12",
-							"categoryName": "Canned & Packaged",
-							"category": "Canned & Packaged"
+						"RomanceDescription": null,
+						"SeoDescription": "progresso-light-zesty-santa-fe-style-chicken-soup",
+						"ServiceCounter": null,
+						"ShipToHomeItem": false,
+						"SoldInStore": false,
+						"TemperatureIndicator": "Ambient",
+						"Verified": true,
+						"MainImage": "https://www.kroger.com/product/images/medium/front/0004119640483",
+						"Slug": "progresso-light-zesty-santa-fe-style-chicken-soup",
+						"Categories": [{
+							"Name": "Canned & Packaged",
+							"Code": "12",
+							"CategoryCode": "12",
+							"CategoryName": "Canned & Packaged",
+							"Category": "Canned & Packaged"
 						}
 						],
-						"calculatedPromoPrice": null,
-						"calculatedRegularPrice": null,
-						"calculatedReferencePrice": null,
-						"displayTemplate": null,
-						"division": null,
-						"minimumAdvertisedPrice": null,
-						"orderBy": null,
-						"regularNFor": null,
-						"referenceNFor": null,
-						"referencePrice": null,
-						"store": null,
-						"endDate": null,
-						"priceNormal": null,
-						"priceSale": null,
-						"promoDescription": null,
-						"promoType": null,
-						"soldBy": null,
-						"promoNfor": null,
-						"complementProductIds": null,
-						"upc": "0004119640483",
-						"couponId": null,
-						"offers": [],
-						"couponIds": [],
-						"monetizationInfo": null,
-						"hasPrice": false,
-						"loyalMember": false,
-						"primaryIndex": 7,
-						"curbsidePickupEligible": false
+						"CalculatedPromoPrice": null,
+						"CalculatedRegularPrice": null,
+						"CalculatedReferencePrice": null,
+						"DisplayTemplate": null,
+						"Division": null,
+						"MinimumAdvertisedPrice": null,
+						"OrderBy": null,
+						"RegularNFor": null,
+						"ReferenceNFor": null,
+						"ReferencePrice": null,
+						"Store": null,
+						"EndDate": null,
+						"PriceNormal": null,
+						"PriceSale": null,
+						"PromoDescription": null,
+						"PromoType": null,
+						"UPC": "0004119640483",
+						"CouponId": null,
+						"Offers": [],
+						"CouponIds": [],
+						"HasPrice": false,
+						"LoyalMember": false,
+						"PrimaryIndex": "7",
+						"CurbsidePickupEligible": false
 					}]
 				};
 
