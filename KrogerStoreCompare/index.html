@@ -57,10 +57,13 @@
 			width:unset;
 		}
 
-		/*div.dataTables_wrapper {
-			width: 800px;
-			margin: 0 auto;
-		}*/
+		table#comparison{
+			width:100%;
+		}
+		table#comparison .container {
+			width:80%;
+		}
+
 	</style>
 </head>
 <body>
@@ -75,10 +78,8 @@
 	<div class="w3-container">
 		<button id="hamburger" class="w3-button w3-display-topleft w3-xlarge w3-theme">☰</button>
 		<h2 class='w3-center'>Price Comparison</h2>
-		Need to add banner when vanity name doesn't contain store name.
 		<label><b>City or Zipcode</b></label>
-		<!-- <div class="w3-bar"> -->
-
+		
 		<div class="w3-row">
 			<input class="w3-input w3-theme w3-border " name="Zipcity" id="searchStoreInput" type="text" value="kansas city">
 			<button class="w3-button w3-ripple w3-center fa fa-search w3-block w3-col w3-theme" id="searchStoreGo"></button>
@@ -608,6 +609,7 @@
 						let container = document.getElementById("productComparisonContainer");
 						while (container.firstChild) container.removeChild(container.firstChild);
 						table.setAttribute("id", "comparison");
+						table.setAttribute("style", "width: 100%");
 						table.className = "stripe row-border order-column";
 
 						container.appendChild(table);
@@ -647,7 +649,11 @@
 							}
 							let clone = storeTemplate.clone();
 							clone.attr('id', null);
-							clone.find("h3")[0].innerText = store.VanityName;
+							let displayName = store.VanityName;
+							if (store.VanityName.toUpperCase().replace(/\s/g, '').indexOf(store.Banner) === -1) {
+								displayName = store.VanityName + " " + store.Banner;
+							}
+							clone.find("h3")[0].innerText = displayName;
 							let paragraphs = clone.find("p");
 							let addressText =
 								store.Address.AddressLine1 + " " +
@@ -658,7 +664,7 @@
 							paragraphs[0].innerText = addressText;
 							paragraphs[1].innerText = store.Distance + " mi."
 							let button = clone.find("button").eq(0);
-							button.attr("data-name", store.VanityName);
+							button.attr("data-name", displayName);
 							button.attr('data-storenumber', store.StoreNumber);
 							button.attr('data-divisionnumber', store.DivisionNumber)
 							button.attr('data-address', addressText);
