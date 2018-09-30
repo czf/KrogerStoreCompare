@@ -3,6 +3,12 @@
     <TargetFramework>net47</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Endpoints\index.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Endpoints\index.html" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="7.0.1" />
     <PackageReference Include="Czf.apiwrapper.Kroger" Version="2.0.0" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.22" />
