@@ -6,7 +6,6 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
 using Czf.ApiWrapper.Kroger;
-using Czf.ApiWrapper.Kroger.Domain;
 using Czf.ApiWrapper.Kroger.Requests;
 using Czf.ApiWrapper.Kroger.Responses;
 using Newtonsoft.Json;
