@@ -181,6 +181,15 @@
 				</div>
 			</div>
 		</div>
+		<div id="incompleteRequestMsg" class="w3-modal">
+			<div class="w3-modal-content">
+				<div class="w3-container">
+					<span onclick="document.getElementById('incompleteRequestMsg').style.display='none'"
+						  class="w3-xlarge w3-button w3-display-topright w3-theme">&times;</span>
+					<p>You need to add at least one store and one product.</p>
+				</div>
+			</div>
+		</div>
 
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.3.5/js/swiper.min.js"></script>
@@ -375,6 +384,10 @@
 
 
 				function comparisonBtn(e) {
+					if (payload.stores.length < 1 || Object.keys(payload.upcs).length < 1) {
+						$("#incompleteRequestMsg").show();
+						return;
+					}
 					$("#getProductComparison").off("click.comparisonBtn").find("button").attr("disabled", "");
 					let comparisonPayload = {
 						"UPCs": Object.keys(payload.upcs),
