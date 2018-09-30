@@ -18,14 +18,10 @@ namespace KrogerStoreCompare.Endpoints
         {
             log.Info("C# HTTP trigger function processed a request.");
 
-
-
             KrogerClient client = Startup.KrogerClient;
             StoreSearchRequest storeSearchRequest = JsonConvert.DeserializeObject<StoreSearchRequest>(req.Content.ReadAsStringAsync().Result);
-
             
-            
-            StoreSearchResponse storeSearchResponse = client.StoreSearch(storeSearchRequest);
+            StoreSearchResponse storeSearchResponse = await client.StoreSearchAsync(storeSearchRequest);
             return req.CreateResponse(HttpStatusCode.OK, storeSearchResponse);
         }
     }

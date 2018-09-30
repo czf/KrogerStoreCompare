@@ -16,13 +16,12 @@ namespace KrogerStoreCompare.Endpoints
         [FunctionName("ProductSearch")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)]HttpRequestMessage req, TraceWriter log)
         {
-
             KrogerClient krogerClient = Startup.KrogerClient;
             SearchAllRequest  searchAllRequest = JsonConvert.DeserializeObject<SearchAllRequest>(req.Content.ReadAsStringAsync().Result);
 
             SearchAllResponse searchAllResponse = krogerClient.SearchAll(searchAllRequest);
 
-            ProductsDetailsResponse productsDetailsResponse =  krogerClient.ProductsDetails(new ProductsDetailsRequest() { UPCs = searchAllResponse.Upcs });
+            ProductsDetailsResponse productsDetailsResponse =  await krogerClient.ProductsDetailsAsync(new ProductsDetailsRequest() { UPCs = searchAllResponse.Upcs });
             
             return req.CreateResponse(HttpStatusCode.OK, 
                 new { productsDetailsResponse.Products}

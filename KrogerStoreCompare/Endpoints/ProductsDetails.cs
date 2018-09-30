@@ -36,9 +36,7 @@ namespace KrogerStoreCompare.Endpoints
                     });
             }
 
-            Task.WaitAll(productsDetailsResponses);
-
-           
+            await Task.WhenAll(productsDetailsResponses);
 
             Dictionary<string, ProductStorePrice> productStorePrices = new Dictionary<string, ProductStorePrice>();
             List<StoreIdentifier> noProductsReturned = new List<StoreIdentifier>();
@@ -47,9 +45,9 @@ namespace KrogerStoreCompare.Endpoints
                 ProductsDetailsResponse result = productsDetailsResponses[a].Result;
                 if(result.TotalCount == 0)
                 {
-
                     noProductsReturned.Add(storesProductsRequests.RequestStoreInfos[a]);
                 }
+
                 foreach(ProductDetail product in result.Products)
                 {
                     if (!productStorePrices.ContainsKey(product.UPC))
