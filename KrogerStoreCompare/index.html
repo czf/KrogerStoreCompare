@@ -209,7 +209,7 @@
 				$("#storesSwiper").on("click.storeBtn", "button", payload, storeBtn);
 				$("#productsSwiper").on("click.productBtn", "button", payload, productBtn);
 				$("#getProductComparison").on(comparisonClick, "button", payload, comparisonBtn);
-				$("#infoOption").on("click", function () { $("#infoMsg").show(); });
+				$("#infoOption").on("click", function () { $("#infoMsg").show(); return false; });
 
 				$("#selectedStores").on("click", "a", removeStore);
 				$("#selectedProducts").on("click", "a", removeProduct);
