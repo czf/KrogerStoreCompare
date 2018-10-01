@@ -91,8 +91,6 @@
 			<div class="swiper-wrapper"></div>
 		</div>
 
-
-
 		<div class="w3-row w3-hide">
 			<label><b>Product name or keyword</b></label>
 			<input class="w3-input w3-theme w3-border " name="product" id="searchProductInput" type="text" value="product">
@@ -110,8 +108,6 @@
 		</div>
 		<div id="productComparisonContainer" class="w3-row">
 		</div>
-
-
 
 		<div style="height:525px;"></div>
 		<div class="w3-hide">
@@ -236,10 +232,9 @@
 					Cookies.remove("infov" + v);
 				}
 
-
 				var mySwiper = new Swiper('#storesSwiper.swiper-container, #productsSwiper.swiper-container', {
 					// Optional parameters
-					//init: false,
+			
 					direction: 'horizontal',
 					loop: false,
 
@@ -257,14 +252,8 @@
 
 				});
 
-
-
-
-
-
 				$(document).on('storeAdded', storeAddedHandler)
 					.on('productAdded', productAddedHandler);
-
 
 				function hamburgerBtn(e) {
 					$("#mySidebar").removeClass("w3-animate-right").addClass("w3-animate-left").show();
@@ -291,7 +280,6 @@
 				}
 
 
-
 				function storeAddedHandler(e) {
 					if (payload.stores.length === MAX_STORES) {
 						$("#searchProductInput").parent().removeClass('w3-hide');
@@ -316,7 +304,6 @@
 				function searchStoreGoFn(e) {
 					$("#searchStoreInput").off(storeKeypress);
 					$("#searchStoreGo").off(storeClick).attr("disabled", "");
-
 
 					var searchTxt = $('#searchStoreInput');
 					if (searchTxt.val() === undefined || searchTxt.val() === '')
@@ -382,10 +369,6 @@
 					apiClient.productSearch(searchTxt.val()).always(addProductSearchBindings);
 				}
 
-
-
-
-
 				function comparisonBtn(e) {
 					if (payload.stores.length < 1 || Object.keys(payload.upcs).length < 1) {
 						$("#incompleteRequestMsg").show();
@@ -404,8 +387,6 @@
 				function addComparisonBindings() {
 					$("#getProductComparison").on(comparisonClick, "button", payload, comparisonBtn).find("button").attr("disabled", null);
 				}
-
-
 
 
 				function storeBtn(event) {
@@ -474,6 +455,7 @@
 
 				var apiClient = (function (client) {  //refactor so data is returned as resolve and display is called outside
 					console.log(client);
+					
 
 					client.storeSearch = function (searchText) {
 						let dfd = $.Deferred();
@@ -484,7 +466,7 @@
 						}
 						else {
 							$.post({
-								url: '//localhost:7071/api/KrogerCompare/StoreSearch/',
+								url: '/api/KrogerCompare/StoreSearch/',
 								data: JSON.stringify({
 									'SearchText': searchText,
 								}),
@@ -503,7 +485,7 @@
 							dfd.resolve();
 						} else {
 							$.post({
-								url: '//localhost:7071/api/ProductSearch',
+								url: '/api/ProductSearch',
 								data: JSON.stringify({
 									'Start': 0,
 									'Count': 24,
@@ -525,7 +507,7 @@
 						}
 						else {
 							$.post({
-								url: '//localhost:7071/api/ProductsDetails',
+								url: '/api/ProductsDetails',
 								data: JSON.stringify(request),
 								contentType: 'application/json',
 							}).done(
@@ -574,7 +556,7 @@
 
 					engine.displayComparison = function (comparisonData) {
 						console.log("display comparison");
-						if (comparisonData === undefined) { comparisonData = mockComparisonData; }
+						if (comparisonData === undefined && mock) { comparisonData = mockComparisonData; }
 						let storeProducts = comparisonData.ProductStorePrices;
 						let noProductStores = comparisonData.NoProductsReturned;
 						let table = document.createElement("table");
@@ -643,15 +625,11 @@
 							}
 
 						});
-
-
-
-
 					};
 
 					engine.displayStores = function (storeData) {
 						console.log('display');
-						if (storeData === undefined) { storeData = mockStoreData; }
+						if (storeData === undefined && mock) { storeData = mockStoreData; }
 						let stores = storeData.Stores;
 
 						let storeTemplate = $("#storeTemplate");
@@ -698,13 +676,11 @@
 						let s = document.querySelector('#storesSwiper').swiper;
 						s.removeAllSlides();
 						s.appendSlide(wrappers.map(function (w) { return w[0] }));
-						//s.slideTo(1);
-
 					};
 
 					engine.displayProductSearchResults = function (productData) {
 						console.log('display');
-						if (productData === undefined) { productData = mockproductData; }
+						if (productData === undefined && mock) { productData = mockproductData; }
 						let products = productData.Products;
 
 						let productTemplate = $("#productTemplate");
@@ -760,14 +736,8 @@
 						}
 					));
 				}
-
-
-
-				function ajax_response(response) {
-					return function (params) {
-						params.success(response);
-					};
-				}
+							   
+				
 				var mock = false;
 
 				var mockComparisonData = {

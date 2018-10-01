@@ -1,0 +1,12 @@
+﻿{
+	"$schema": "http://json.schemastore.org/proxies",
+	"proxies": {
+		"indexProxyApi": {
+			"matchCondition": {
+				"route": "/",
+				"methods": [ "GET" ]
+			},
+			"backendUri": "https://localhost/api/IndexLoader"
+		}
+	}
+}

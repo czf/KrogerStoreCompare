@@ -1,0 +1,776 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Price Comparison</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+	<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-black.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.3.5/css/swiper.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.19/css/jquery.dataTables.min.css" />
+	<link rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/3.2.6/css/fixedColumns.dataTables.min.css" />
+	
+	<!--
+	 
+		original inspiration 
+		https://old.reddit.com/r/SeattleWA/comments/8tce3n/groceries_cost_nearly_30_percent_more_in_seattle/e16dywj/
+		similar 
+		https://old.reddit.com/r/Seattle/comments/8n9e48/grocery_prices_in_seattle_are_the_second_highest/
+		-->
+	<style>
+		button, input, a {
+			outline: none;
+		}
+		.w3-modal-content {
+			border: 1px solid white;
+		}
+
+		button.fa-search {
+			font-size: x-large;
+		}
+
+		.swiper-slide.w3-row {
+			padding-bottom: 37px;
+			/*display:flex;*/
+		}
+
+		#productsSwiper .w3-card {
+			padding-top: 4px;
+		}
+
+		td {
+			white-space: nowrap;
+		}
+
+		div.dataTables_wrapper tr {
+			height: 120px;
+		}
+
+		s {
+			font-size: 70%;
+		}
+
+		.w3-sidebar{
+			z-index:2;
+			min-width:250px;
+			width:unset;
+		}
+
+		table#comparison{
+			width:100%;
+		}
+		table#comparison .container {
+			width:80%;
+		}
+
+	</style>
+</head>
+<body>
+	<div class="w3-sidebar w3-bar-block w3-theme" style="display:none" id="mySidebar">
+		<button id="closeMySidebar" class="w3-bar-item w3-button w3-large">Close &times;</button>
+		<div id="storesTitle" class="w3-bar-item ">Stores <span class="w3-right w3-tiny">click a store to remove it</span></div>
+		<div id="selectedStores" class="w3-container "></div>
+		<div class="w3-bar-item ">Products <span class="w3-right w3-tiny">click a product to remove it</span></div>
+		<div id="selectedProducts" class="w3-container "></div>
+		<a id="infoOption" href="#" class="w3-bar-item w3-button">Info</a>
+	</div>
+	<div class="w3-container">
+		<button id="hamburger" class="w3-button w3-display-topleft w3-xlarge w3-theme">☰</button>
+		<h2 class='w3-center'>Price Comparison</h2>
+		<label><b>City or Zipcode</b></label>
+
+		<div class="w3-row">
+			<input class="w3-input w3-theme w3-border " name="Zipcity" id="searchStoreInput" type="text" >
+			<button class="w3-button w3-ripple w3-center fa fa-search w3-block w3-col w3-theme" id="searchStoreGo"></button>
+		</div>
+		<div id="storesSwiper" class="swiper-container">
+			<div class="swiper-pagination"></div>
+			<div class="swiper-button-prev"></div>
+			<div class="swiper-button-next"></div>
+			<div class="swiper-wrapper"></div>
+		</div>
+
+		<div class="w3-row w3-hide">
+			<label><b>Product name or keyword</b></label>
+			<input class="w3-input w3-theme w3-border " name="product" id="searchProductInput" type="text" >
+			<button class="w3-button w3-ripple w3-center fa fa-search w3-block w3-col w3-theme" id="searchProductGo"></button>
+		</div>
+		<div id="productsSwiper" class="swiper-container">
+			<div class="swiper-pagination"></div>
+			<div class="swiper-button-prev"></div>
+			<div class="swiper-button-next"></div>
+			<div class="swiper-wrapper"></div>
+		</div>
+
+		<div id="getProductComparison" class="w3-row w3-hide">
+			<button class="w3-button w3-bar w3-theme">Get Store Comparison</button>
+		</div>
+		<div id="productComparisonContainer" class="w3-row">
+		</div>
+
+		<div style="height:525px;"></div>
+		<div class="w3-hide">
+			<div id="storeTemplate" class="w3-card w3-third w3-cell w3-mobile " style="">
+				<header class="w3-container">
+					<h3>VanityName</h3>
+				</header>
+				<div class="w3-container"> <p>address</p> <p>distance</p></div>
+				<footer class="w3-container " style=""><h5 class="w3-center"><button class="w3-button w3-ripple w3-center w3-theme">add store</button>  </h5></footer>
+
+			</div>
+			<div id="storeWrapperTemplate" class="w3-row swiper-slide w3-cell-row"></div>
+			<div id="productTemplate" class="w3-card w3-third w3-center">
+				<div class="w3-container ">
+					<picture>
+						<source media="(min-width:601px)" />
+						<source media="(max-width:600px)" />
+						<img />
+					</picture>
+				</div>
+				<div class="w3-container">
+
+				</div>
+				<div class="w3-container">
+
+				</div>
+				<footer class="w3-container">
+					<h5 class="w3-center"><button class="w3-button w3-ripple w3-center w3-theme">add product</button> </h5>
+				</footer>
+			</div>
+			<div id="productWrapperTemplate" class="w3-row swiper-slide"></div>
+		</div>
+		<div id="storeLimit" class="w3-modal">
+			<div class="w3-modal-content">
+				<div class="w3-container">
+					<span onclick="document.getElementById('storeLimit').style.display='none'"
+						  class="w3-xlarge w3-button w3-display-topright w3-theme">&times;</span>
+					<p>You've reached the limit of stores for comparison. </p>
+					<p>
+						You'll need to remove a store before another can be added. You can find your current selections
+						in the menu access at upper left corner of the page.
+					</p>
+				</div>
+			</div>
+		</div>
+		<div id="productLimit" class="w3-modal">
+			<div class="w3-modal-content">
+				<div class="w3-container">
+					<span onclick="document.getElementById('productLimit').style.display='none'"
+						  class="w3-xlarge w3-button w3-display-topright w3-theme">&times;</span>
+					<p>You've reached the limit of products for comparison. </p>
+					<p>
+						You'll need to remove a product before another can be added. You can find your current selections
+						in the menu access at upper left corner of the page.
+					</p>
+				</div>
+			</div>
+		</div>
+		<div id="infoMsg" class="w3-modal">
+			<div class="w3-modal-content">
+				<div class="w3-container w3-large">
+					<span onclick="document.getElementById('infoMsg').style.display='none'"
+						  class="w3-xlarge w3-button w3-display-topright w3-theme">&times;</span>
+					<h6>Cookies</h6>
+					<p>
+						This site uses cookies for google tracking and page functionality.
+						You can block Google tracking(and many similar scripts) with the <a target="_blank" id="uBlockLink" href="https://github.com/gorhill/uBlock#installation">Ublock Origin</a> browser plugin
+					</p>
+					<h6>Note</h6>
+					<p>Some stores won't have any pricing data available.  Known stores without data: Kwik Shop </p>
+					<h6>Source Code</h6>
+					<p>Source code can be found on <a id="gitSourceLink" target="_blank" href="https://github.com/czf/KrogerStoreCompare">GitHub</a></p>
+				</div>
+			</div>
+		</div>
+		<div id="incompleteRequestMsg" class="w3-modal">
+			<div class="w3-modal-content">
+				<div class="w3-container">
+					<span onclick="document.getElementById('incompleteRequestMsg').style.display='none'"
+						  class="w3-xlarge w3-button w3-display-topright w3-theme">&times;</span>
+					<p>You need to add at least one store and one product.</p>
+				</div>
+			</div>
+		</div>
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.3.5/js/swiper.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.19/js/jquery.dataTables.min.js"></script>
+		<script src="https://cdn.datatables.net/fixedcolumns/3.2.6/js/dataTables.fixedColumns.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.0/js.cookie.min.js"></script>
+		<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-126666332-1"></script>
+
+		<script>
+			$(readyFn);
+			function readyFn() {
+				const VERSION = 1;
+				const MAX_STORES = 2;
+				const MAX_PRODUCTS = 5;
+				let storeKeypress = "keypress.storeInput";
+				let storeClick = "click.storeGo";
+				let productKeypress = "keypress.productSearchInput";
+				let productSearchClick = "click.productSearchGo";
+				let comparisonClick = "click.comparisonBtn";
+				let payload = { stores: [], upcs: [] };
+				addStoreSearchBindings();
+				addProductSearchBindings();
+				$("#hamburger").on("click", hamburgerBtn);
+				$("#closeMySidebar").on("click", closeSidebar);
+
+
+				$("#storesSwiper").on("click.storeBtn", "button", payload, storeBtn);
+				$("#productsSwiper").on("click.productBtn", "button", payload, productBtn);
+				$("#getProductComparison").on(comparisonClick, "button", payload, comparisonBtn);
+				$("#infoOption").on("click", function () { $("#infoMsg").show(); return false; });
+
+				$("#selectedStores").on("click", "a", removeStore);
+				$("#selectedProducts").on("click", "a", removeProduct);
+
+				let versionCookie = Cookies.get('infov' + VERSION);
+				if (!versionCookie) {
+					Cookies.set('infov' + VERSION, 1);
+					$("#infoOption").click();
+				}
+
+				for (let v = 1; v < VERSION; v++) {
+					Cookies.remove("infov" + v);
+				}
+
+				var mySwiper = new Swiper('#storesSwiper.swiper-container, #productsSwiper.swiper-container', {
+					// Optional parameters
+
+					direction: 'horizontal',
+					loop: false,
+
+					grabCursor: true,
+					// If we need pagination
+					pagination: {
+						el: '.swiper-pagination',
+					},
+					slidesPerView: 1,
+					// Navigation arrows
+					navigation: {
+						nextEl: '.swiper-button-next',
+						prevEl: '.swiper-button-prev',
+					},
+
+				});
+
+				$(document).on('storeAdded', storeAddedHandler)
+					.on('productAdded', productAddedHandler);
+
+				function hamburgerBtn(e) {
+					$("#mySidebar").removeClass("w3-animate-right").addClass("w3-animate-left").show();
+				}
+
+				function closeSidebar(e) {
+					$("#mySidebar").hide();
+				}
+
+				function removeStore(e) {
+					let option = $(e.target);
+					let storeObj = {
+						StoreId: option.attr('data-storeId'),
+						DivisionId: option.attr('data-divisionId'),
+
+					};
+					let indx = undefined;
+					if ((indx = indexOfStore(storeObj)) >= 0) {
+						payload.stores.splice(indx, 1);
+						$("#storesSwiper button[data-storenumber='" + storeObj.StoreId + "'][data-divisionnumber='" + storeObj.DivisionId + "']").text("add store");
+
+						displayEngine.deleteMenuStoreOption(storeObj);
+					}
+				}
+
+
+				function storeAddedHandler(e) {
+					if (payload.stores.length === MAX_STORES) {
+						$("#searchProductInput").parent().removeClass('w3-hide');
+					}
+					displayEngine.createMenuStoreOption(e.detail);
+				}
+
+
+				function addStoreSearchBindings() {
+					$("#searchStoreInput").on(storeKeypress, searchStoreFn);
+					$("#searchStoreGo").on(storeClick, searchStoreGoFn).attr("disabled", null);
+				}
+
+				function searchStoreFn(e) {
+					//If enter is pressed post a search store request.
+					// Number 13 is the "Enter" key on the keyboard
+					if (e.keyCode === 13) {
+						searchStoreGoFn(e);
+					}
+				}
+
+				function searchStoreGoFn(e) {
+					$("#searchStoreInput").off(storeKeypress);
+					$("#searchStoreGo").off(storeClick).attr("disabled", "");
+
+					var searchTxt = $('#searchStoreInput');
+					if (searchTxt.val() === undefined || searchTxt.val() === '') {
+						addStoreSearchBindings();
+						return false;
+					}
+
+					apiClient.storeSearch(searchTxt.val()).always(addStoreSearchBindings);
+				}
+
+
+				function removeProduct(e) {
+					console.log('removeProduct');
+					let upc = $(e.target).attr('id');
+					let indx = Object.keys(payload.upcs).indexOf(upc);
+					if (indx > -1) {
+						delete payload.upcs[upc];
+						$("#productsSwiper button[data-upc='" + upc + "']").text('add product');
+						displayEngine.deleteMenuProductOption(upc);
+					}
+
+				}
+
+				function productAddedHandler(e) {
+					if (Object.keys(payload.upcs).length >= 1 && payload.stores.length >= 1) {
+						$("#getProductComparison").removeClass('w3-hide');
+					} else {
+						$("#getProductComparison").addClass('w3-hide');
+					}
+					let option = $("#" + e.detail.UPC);
+					if (e.detail && option.length > 0) {
+						//remove event
+						displayEngine.deleteMenuProductOption(e.detail.UPC);
+					}
+					else {
+						//add event
+						displayEngine.createMenuProductOption(e.detail);
+						gtag('event', 'addProduct', { 'event_category': 'add', 'productName': e.detail.Name});
+					}
+
+				}
+
+				function addProductSearchBindings() {
+					$("#searchProductInput").on(productKeypress, searchProductFn);
+					$("#searchProductGo").on(productSearchClick, searchProductGoFn).attr("disabled", null);
+				}
+
+				function searchProductFn(e) {
+					//If enter is pressed post a search store request.
+					// Number 13 is the "Enter" key on the keyboard
+					if (e.keyCode === 13) {
+						searchProductGoFn(e);
+					}
+
+				}
+
+				function searchProductGoFn(e) {
+					$("#searchProductInput").off(productKeypress);
+					$("#searchProductGo").off(productSearchClick).attr("disabled", "");
+
+
+					var searchTxt = $('#searchProductInput');
+					if (searchTxt.val() === undefined || searchTxt.val() === '') {
+						addProductSearchBindings()
+						return false;
+					}
+
+					apiClient.productSearch(searchTxt.val()).always(addProductSearchBindings);
+				}
+
+				function comparisonBtn(e) {
+					if (payload.stores.length < 1 || Object.keys(payload.upcs).length < 1) {
+						$("#incompleteRequestMsg").show();
+						return;
+					}
+					$("#getProductComparison").off("click.comparisonBtn").find("button").attr("disabled", "");
+					let comparisonPayload = {
+						"UPCs": Object.keys(payload.upcs),
+						"RequestStoreInfos": payload.stores
+					};
+
+					apiClient.requestComparison(comparisonPayload).always(addComparisonBindings);
+
+				}
+
+				function addComparisonBindings() {
+					$("#getProductComparison").on(comparisonClick, "button", payload, comparisonBtn).find("button").attr("disabled", null);
+				}
+
+
+				function storeBtn(event) {
+					let btn = $(event.target);
+					let storeObj = {
+						StoreId: btn.attr('data-storenumber'),
+						DivisionId: btn.attr('data-divisionnumber'),
+						Name: btn.attr("data-name")
+					};
+					let indx = undefined;
+					if ((indx = indexOfStore(storeObj)) >= 0) {
+						payload.stores.splice(indx, 1);
+						btn.text("add store");
+						displayEngine.deleteMenuStoreOption(storeObj);
+					}
+					else if (payload.stores.length >= MAX_STORES) {
+						$("#storeLimit").show();
+					}
+					else {
+						payload.stores.push(storeObj);
+						storeObj.Address = btn.attr("data-address");
+						btn.text("remove store");
+						let storeAddedEvt = $.Event('storeAdded', { 'detail': storeObj });
+						storeAddedEvt.currentTarget = event.target;// TODO DO I NEED THIS????
+						$(document).trigger(storeAddedEvt);
+
+					}
+				}
+
+				function indexOfStore(store) {
+					return (payload.stores.findIndex(
+						function (element) {
+							return storeCheck(element, store)
+						}
+					));
+				}
+
+				function storeCheck(element, target) {
+					return element.StoreId === target.StoreId &&
+						element.DivisionId === target.DivisionId;
+				}
+
+
+				function productBtn(event) {
+					let btn = $(event.target);
+					let upc = btn.attr('data-upc');
+					let name = btn.attr('data-name');
+					let indx = Object.keys(payload.upcs).indexOf(upc);
+					if (indx > -1) {
+
+						let addedEvent = $.Event('productAdded', { 'detail': { UPC: upc } });
+						$(document).trigger(addedEvent);
+						delete payload.upcs[upc];
+						btn.text("add product");
+					}
+					else if (Object.keys(payload.upcs).length >= MAX_PRODUCTS) {
+						$("#productLimit").show();
+					}
+					else {
+						payload.upcs[upc] = {};
+						btn.text("remove product");
+						let addedEvent = $.Event('productAdded', { 'detail': { UPC: upc, Name: name } });
+						$(document).trigger(addedEvent);
+					}
+				}
+
+				var apiClient = (function (client) {  //refactor so data is returned as resolve and display is called outside
+				
+					client.storeSearch = function (searchText) {
+						let dfd = $.Deferred();
+						gtag('event', 'storeSearch', { 'event_category': 'search', 'locationSearchTerm': searchText });
+						console.log('search');
+						if (mock) {
+							displayEngine.displayStores(mockStoreData);
+							dfd.resolve();
+						}
+						else {
+							$.post({
+								url: '/api/KrogerCompare/StoreSearch/',
+								data: JSON.stringify({
+									'SearchText': searchText,
+								}),
+								contentType: 'application/json',
+
+							}).done(function (storeData) { displayEngine.displayStores(storeData); dfd.resolve(); });
+						}
+						return dfd.promise();
+					};
+
+					client.productSearch = function (searchText) {
+						let dfd = $.Deferred();
+						gtag('event', 'productSearch', { 'event_category': 'search', 'productSearchTerm': searchText });
+						console.log('product search');
+						if (mock) {
+							displayEngine.displayProductSearchResults(mockProductSearchData);
+							dfd.resolve();
+						} else {
+							$.post({
+								url: '/api/ProductSearch',
+								data: JSON.stringify({
+									'Start': 0,
+									'Count': 24,
+									'Tab': 0,
+									'Query': searchText
+								}),
+								contentType: 'application/json',
+							}).done(function (productData) { displayEngine.displayProductSearchResults(productData); dfd.resolve(); });
+						}
+						return dfd.promise();
+					};
+
+					client.requestComparison = function (request) {
+						let dfd = $.Deferred();
+						console.log('comparison');
+						gtag('event', 'comparisonRequest', { 'upcCount': payload.stores.length, 'storeCount': Object.keys(payload).length});
+						if (mock) {
+							displayEngine.displayComparison(mockComparisonData);
+							dfd.resolve();
+						}
+						else {
+							$.post({
+								url: '/api/ProductsDetails',
+								data: JSON.stringify(request),
+								contentType: 'application/json',
+							}).done(
+								function (comparisonData) { displayEngine.displayComparison(comparisonData); dfd.resolve(); });
+						}
+						return dfd.promise();
+					}
+
+					return client;
+				})(function () { });
+
+				var displayEngine = (function (engine) {
+					let option = document.createElement("a");
+					option.className = "w3-bar-item w3-button";
+
+					engine.createMenuProductOption = function (product) {
+						let productOption = option.cloneNode();
+						productOption.setAttribute("id", product.UPC);
+						productOption.innerText = product.Name;
+						document.getElementById("selectedProducts").appendChild(productOption);
+					};
+
+					engine.deleteMenuProductOption = function (upc) {
+						let deleteOption = document.getElementById(upc);
+						deleteOption.parentNode.removeChild(deleteOption);
+
+					};
+
+					engine.createMenuStoreOption = function (store) {
+						console.log('createmenustoreoption');
+						console.log(store);
+						let storeOption = option.cloneNode();
+						storeOption.innerText = store.Name + ": " + store.Address;
+						storeOption.setAttribute("id", store.StoreId + '-' + store.DivisionId);
+						storeOption.setAttribute("data-storeId", store.StoreId);
+						storeOption.setAttribute("data-divisionId", store.DivisionId);
+						document.getElementById("selectedStores").appendChild(storeOption);
+
+					};
+
+					engine.deleteMenuStoreOption = function (store) {
+						let deleteOption = document.getElementById(store.StoreId + "-" + store.DivisionId);
+						deleteOption.parentNode.removeChild(deleteOption);
+
+					};
+
+					engine.displayComparison = function (comparisonData) {
+						console.log("display comparison");
+						if (comparisonData === undefined && mock) { comparisonData = mockComparisonData; }
+						let storeProducts = comparisonData.ProductStorePrices;
+						let noProductStores = comparisonData.NoProductsReturned;
+						let table = document.createElement("table");
+
+						let tHead = document.createElement("thead");
+						let headRow = document.createElement("tr");
+						headRow.appendChild(document.createElement("th"));
+
+						storeProducts.forEach(function (product) {
+							let th = document.createElement("th");
+							th.innerText = product.Description + " " + product.CustomerFacingSize;
+							headRow.appendChild(th)
+						})
+
+						tHead.appendChild(headRow);
+
+						let tBody = document.createElement("tbody");
+
+						payload.stores.forEach(function (store) {
+							if (!noProductStores.some(x => x.DivisionId === store.DivisionId &&
+								x.StoreId === store.StoreId)) {
+								let tr = document.createElement("tr");
+								let cell = document.createElement("td");
+								cell.innerText = store.Name;
+								tr.appendChild(cell);
+								storeProducts.forEach(function (storeProduct) {
+									storePrice = storeProduct.StorePrices.filter(x => x.StoreIdentifier.DivisionId === store.DivisionId && x.StoreIdentifier.StoreId === store.StoreId)[0];
+									let priceCell = document.createElement("td");
+									if (!storePrice) {
+										priceCell.innerText = "N/A";
+									}
+									else if (storePrice.PriceSale) {
+										priceCell.innerText = storePrice.PriceSale + " ";
+										let sPrice = document.createElement("s");
+										sPrice.innerText = storePrice.PriceNormal;
+										priceCell.appendChild(sPrice);
+
+									} else {
+										priceCell.innerText = storePrice.PriceNormal;
+									}
+									tr.appendChild(priceCell);
+								});
+								tBody.appendChild(tr);
+							}
+						});
+						table.appendChild(tHead);
+						table.appendChild(tBody);
+						let container = document.getElementById("productComparisonContainer");
+						while (container.firstChild) container.removeChild(container.firstChild);
+						table.setAttribute("id", "comparison");
+						table.setAttribute("style", "width: 100%");
+						table.className = "stripe row-border order-column";
+
+						container.appendChild(table);
+						$('#comparison').DataTable({
+
+							searching: false,
+							scrollY: "300px",
+							scrollX: true,
+							scrollCollapse: true,
+							paging: false,
+							fixedColumns: {
+								leftColumns: 1,
+								rightColumns: 0,
+								heightMatch: 'none'
+							}
+
+						});
+					};
+
+					engine.displayStores = function (storeData) {
+						console.log('display');
+						if (storeData === undefined && mock) { storeData = mockStoreData; }
+						let stores = storeData.Stores;
+
+						let storeTemplate = $("#storeTemplate");
+						let wrapper = undefined
+						let wrappers = [];
+						$.each(stores, function (index, store) {
+							if (index % 3 === 0) {
+								wrapper = $("#storeWrapperTemplate").clone();
+								wrapper.attr('id', null);
+								wrappers.push(wrapper);
+							}
+							let clone = storeTemplate.clone();
+							clone.attr('id', null);
+							let displayName = store.VanityName;
+							if (store.VanityName.toUpperCase().replace(/\s/g, '').indexOf(store.Banner) === -1) {
+								displayName = store.VanityName + " " + store.Banner;
+							}
+							clone.find("h3")[0].innerText = displayName;
+							let paragraphs = clone.find("p");
+							let addressText =
+								store.Address.AddressLine1 + " " +
+								(!store.Address.AddressLine2 ? "" : store.Address.AddressLine2) + " " +
+								store.Address.City + " " +
+								store.Address.StateCode + " " +
+								store.Address.Zip;
+							paragraphs[0].innerText = addressText;
+							paragraphs[1].innerText = store.Distance + " mi."
+							let button = clone.find("button").eq(0);
+							button.attr("data-name", displayName);
+							button.attr('data-storenumber', store.StoreNumber);
+							button.attr('data-divisionnumber', store.DivisionNumber)
+							button.attr('data-address', addressText);
+							let storeObj = {
+								StoreId: store.StoreNumber,
+								DivisionId: store.DivisionNumber
+							};
+							if (indexOfStore(storeObj) > -1) {
+								button.text("remove store");
+							}
+
+							wrapper.append(clone);
+
+						});
+						let s = document.querySelector('#storesSwiper').swiper;
+						s.removeAllSlides();
+						s.appendSlide(wrappers.map(function (w) { return w[0] }));
+					};
+
+					engine.displayProductSearchResults = function (productData) {
+						console.log('display');
+						if (productData === undefined && mock) { productData = mockproductData; }
+						let products = productData.Products;
+
+						let productTemplate = $("#productTemplate");
+						let wrapper = undefined
+						let wrappers = [];
+
+						$.each(products, function (index, product) {
+							if (index % 3 === 0) {
+								wrapper = $("#productWrapperTemplate").clone();
+								wrapper.attr('id', null);
+								wrappers.push(wrapper);
+							}
+							let clone = productTemplate.clone();
+							clone.attr('id', null);
+							clone.find("img")[0].src = product.mainImage;
+							let smallImgIndx = indexOfSmallImage(product);
+							let smallImage = undefined;
+							if (smallImgIndx === -1) { smallImage = product.MainImage; }
+							else { smallImage = product.Images[smallImgIndx].Url; }
+
+							let sources = clone.find("source");
+							sources[0].srcset = product.MainImage;
+							sources[1].srcset = smallImage
+							let containers = clone.find("div.w3-container");
+							containers[1].innerText = product.Description;
+
+							containers[2].innerText = product.CustomerFacingSize;
+							let button = clone.find("button").eq(0);
+							button.attr('data-upc', product.UPC);
+							button.attr('data-name', product.Description);
+
+							if (Object.keys(payload.upcs).indexOf(product.UPC) > -1) {
+								button.text("remove product");
+							}
+
+							wrapper.append(clone);
+
+						});
+
+						let s = document.querySelector('#productsSwiper').swiper;
+						s.removeAllSlides();
+						s.appendSlide(wrappers.map(function (w) { return w[0] }));
+
+					}
+
+					return engine;
+				})(function () { });
+
+				function indexOfSmallImage(product) {
+					return (product.Images.findIndex(
+						function (image) {
+							return image.Size === 'small' && image.Perspective === 'front';
+						}
+					));
+				}
+
+
+				var mock = false;
+
+			}
+			(adsbygoogle = window.adsbygoogle || []).push({
+				google_ad_client: "ca-pub-6675570834474275",
+				enable_page_level_ads: true
+			});
+
+			window.dataLayer = window.dataLayer || [];
+			function gtag() { dataLayer.push(arguments); }
+			gtag('js', new Date());
+			gtag('config', 'UA-126666332-1', {
+				'link_attribution': true,
+				'custom_map': {
+					'metric1': 'locationSearchTerm',
+					'metric2': 'productSearchTerm',
+					'metric3': 'upcCount',
+					'metric4': 'storeCount',
+					'metric5': 'productName'}
+			});
+		</script>
+		
+	</div>
+</body>
+</html>

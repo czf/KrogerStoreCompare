@@ -4,9 +4,19 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Endpoints\index.html" />
+    <None Remove="index_hasStubs.html" />
+    <None Remove="proxies.json" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Endpoints\index.html" />
+    <Content Include="index_hasStubs.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="index.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="proxies.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="7.0.1" />
