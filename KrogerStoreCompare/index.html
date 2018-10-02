@@ -177,7 +177,7 @@
 						You can block Google tracking(and many similar scripts) with the <a target="_blank" id="uBlockLink" href="https://github.com/gorhill/uBlock#installation">Ublock Origin</a> browser plugin
 					</p>
 					<h6>Note</h6>
-					<p>Some stores won't have any pricing data available.  Known stores without data: Kwik Shop </p>
+					<p>Some stores won't have any pricing data available.  Known stores without data: Kwik Shop, Quik Stop </p>
 					<h6>Source Code</h6>
 					<p>Source code can be found on <a id="gitSourceLink" target="_blank" href="https://github.com/czf/KrogerStoreCompare">GitHub</a></p>
 				</div>
@@ -205,7 +205,8 @@
 			$(readyFn);
 			function readyFn() {
 				const VERSION = 1;
-				const MAX_STORES = 2;
+				const MAX_STORES = 3;
+				const MIN_STORES = 1;
 				const MAX_PRODUCTS = 5;
 				let storeKeypress = "keypress.storeInput";
 				let storeClick = "click.storeGo";
@@ -286,7 +287,7 @@
 
 
 				function storeAddedHandler(e) {
-					if (payload.stores.length === MAX_STORES) {
+					if (payload.stores.length >= MIN_STORES) {
 						$("#searchProductInput").parent().removeClass('w3-hide');
 					}
 					displayEngine.createMenuStoreOption(e.detail);
