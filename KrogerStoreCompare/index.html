@@ -81,7 +81,7 @@
 		<label><b>City or Zipcode</b></label>
 
 		<div class="w3-row">
-			<input class="w3-input w3-theme w3-border " name="Zipcity" id="searchStoreInput" type="text" >
+			<input class="w3-input w3-theme w3-border " name="Zipcity" id="searchStoreInput" type="text">
 			<button class="w3-button w3-ripple w3-center fa fa-search w3-block w3-col w3-theme" id="searchStoreGo"></button>
 		</div>
 		<div id="storesSwiper" class="swiper-container">
@@ -90,10 +90,13 @@
 			<div class="swiper-button-next"></div>
 			<div class="swiper-wrapper"></div>
 		</div>
+		<div id="noStoresMsg" class="w3-row w3-center" style="display:none;">
+			<p>search returned no stores</p>
+		</div>
 
 		<div class="w3-row w3-hide">
 			<label><b>Product name or keyword</b></label>
-			<input class="w3-input w3-theme w3-border " name="product" id="searchProductInput" type="text" >
+			<input class="w3-input w3-theme w3-border " name="product" id="searchProductInput" type="text">
 			<button class="w3-button w3-ripple w3-center fa fa-search w3-block w3-col w3-theme" id="searchProductGo"></button>
 		</div>
 		<div id="productsSwiper" class="swiper-container">
@@ -101,6 +104,9 @@
 			<div class="swiper-button-prev"></div>
 			<div class="swiper-button-next"></div>
 			<div class="swiper-wrapper"></div>
+		</div>
+		<div id="noProductsMsg" class="w3-row w3-center" style="display:none;">
+			<p>search returned no products</p>
 		</div>
 
 		<div id="getProductComparison" class="w3-row w3-hide">
@@ -198,7 +204,6 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.19/js/jquery.dataTables.min.js"></script>
 		<script src="https://cdn.datatables.net/fixedcolumns/3.2.6/js/dataTables.fixedColumns.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.0/js.cookie.min.js"></script>
-		<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-126666332-1"></script>
 
 		<script>
@@ -347,7 +352,7 @@
 					else {
 						//add event
 						displayEngine.createMenuProductOption(e.detail);
-						gtag('event', 'addProduct', { 'event_category': 'add', 'productName': e.detail.Name});
+						gtag('event', 'addProduct', { 'event_category': 'add', 'productName': e.detail.Name });
 					}
 
 				}
@@ -465,7 +470,7 @@
 				}
 
 				var apiClient = (function (client) {  //refactor so data is returned as resolve and display is called outside
-				
+
 					client.storeSearch = function (searchText) {
 						let dfd = $.Deferred();
 						gtag('event', 'storeSearch', { 'event_category': 'search', 'locationSearchTerm': searchText });
@@ -512,7 +517,7 @@
 					client.requestComparison = function (request) {
 						let dfd = $.Deferred();
 						console.log('comparison');
-						gtag('event', 'comparisonRequest', { 'upcCount': payload.stores.length, 'storeCount': Object.keys(payload).length});
+						gtag('event', 'comparisonRequest', { 'upcCount': payload.stores.length, 'storeCount': Object.keys(payload).length });
 						if (mock) {
 							displayEngine.displayComparison(mockComparisonData);
 							dfd.resolve();
@@ -641,56 +646,63 @@
 
 					engine.displayStores = function (storeData) {
 						console.log('display');
+						let noStoresMsg = $("#noProductsMsg");
 						if (storeData === undefined && mock) { storeData = mockStoreData; }
 						let stores = storeData.Stores;
 
 						let storeTemplate = $("#storeTemplate");
 						let wrapper = undefined
 						let wrappers = [];
-						$.each(stores, function (index, store) {
-							if (index % 3 === 0) {
-								wrapper = $("#storeWrapperTemplate").clone();
-								wrapper.attr('id', null);
-								wrappers.push(wrapper);
-							}
-							let clone = storeTemplate.clone();
-							clone.attr('id', null);
-							let displayName = store.VanityName;
-							if (store.VanityName.toUpperCase().replace(/\s/g, '').indexOf(store.Banner) === -1) {
-								displayName = store.VanityName + " " + store.Banner;
-							}
-							clone.find("h3")[0].innerText = displayName;
-							let paragraphs = clone.find("p");
-							let addressText =
-								store.Address.AddressLine1 + " " +
-								(!store.Address.AddressLine2 ? "" : store.Address.AddressLine2) + " " +
-								store.Address.City + " " +
-								store.Address.StateCode + " " +
-								store.Address.Zip;
-							paragraphs[0].innerText = addressText;
-							paragraphs[1].innerText = store.Distance + " mi."
-							let button = clone.find("button").eq(0);
-							button.attr("data-name", displayName);
-							button.attr('data-storenumber', store.StoreNumber);
-							button.attr('data-divisionnumber', store.DivisionNumber)
-							button.attr('data-address', addressText);
-							let storeObj = {
-								StoreId: store.StoreNumber,
-								DivisionId: store.DivisionNumber
-							};
-							if (indexOfStore(storeObj) > -1) {
-								button.text("remove store");
-							}
+						if (stores && stores.length > 0) {
+							noStoresMsg.hide();
+							$.each(stores, function (index, store) {
+								if (index % 3 === 0) {
+									wrapper = $("#storeWrapperTemplate").clone();
+									wrapper.attr('id', null);
+									wrappers.push(wrapper);
+								}
+								let clone = storeTemplate.clone();
+								clone.attr('id', null);
+								let displayName = store.VanityName;
+								if (store.VanityName.toUpperCase().replace(/\s/g, '').indexOf(store.Banner) === -1) {
+									displayName = store.VanityName + " " + store.Banner;
+								}
+								clone.find("h3")[0].innerText = displayName;
+								let paragraphs = clone.find("p");
+								let addressText =
+									store.Address.AddressLine1 + " " +
+									(!store.Address.AddressLine2 ? "" : store.Address.AddressLine2) + " " +
+									store.Address.City + " " +
+									store.Address.StateCode + " " +
+									store.Address.Zip;
+								paragraphs[0].innerText = addressText;
+								paragraphs[1].innerText = store.Distance + " mi."
+								let button = clone.find("button").eq(0);
+								button.attr("data-name", displayName);
+								button.attr('data-storenumber', store.StoreNumber);
+								button.attr('data-divisionnumber', store.DivisionNumber)
+								button.attr('data-address', addressText);
+								let storeObj = {
+									StoreId: store.StoreNumber,
+									DivisionId: store.DivisionNumber
+								};
+								if (indexOfStore(storeObj) > -1) {
+									button.text("remove store");
+								}
 
-							wrapper.append(clone);
+								wrapper.append(clone);
 
-						});
+							});
+						} else {
+							noStoresMsg.show();
+						}
 						let s = document.querySelector('#storesSwiper').swiper;
 						s.removeAllSlides();
 						s.appendSlide(wrappers.map(function (w) { return w[0] }));
 					};
 
 					engine.displayProductSearchResults = function (productData) {
+						let noProductsMsg = $("#noProductsMsg");
 						console.log('display');
 						if (productData === undefined && mock) { productData = mockproductData; }
 						let products = productData.Products;
@@ -698,44 +710,47 @@
 						let productTemplate = $("#productTemplate");
 						let wrapper = undefined
 						let wrappers = [];
+						if (products && products.length > 0) {
+							noProductsMsg.hide();
+							$.each(products, function (index, product) {
+								if (index % 3 === 0) {
+									wrapper = $("#productWrapperTemplate").clone();
+									wrapper.attr('id', null);
+									wrappers.push(wrapper);
+								}
+								let clone = productTemplate.clone();
+								clone.attr('id', null);
+								clone.find("img")[0].src = product.MainImage;
+								let smallImgIndx = indexOfSmallImage(product);
+								let smallImage = undefined;
+								if (smallImgIndx === -1) { smallImage = product.MainImage; }
+								else { smallImage = product.Images[smallImgIndx].Url; }
 
-						$.each(products, function (index, product) {
-							if (index % 3 === 0) {
-								wrapper = $("#productWrapperTemplate").clone();
-								wrapper.attr('id', null);
-								wrappers.push(wrapper);
-							}
-							let clone = productTemplate.clone();
-							clone.attr('id', null);
-							clone.find("img")[0].src = product.mainImage;
-							let smallImgIndx = indexOfSmallImage(product);
-							let smallImage = undefined;
-							if (smallImgIndx === -1) { smallImage = product.MainImage; }
-							else { smallImage = product.Images[smallImgIndx].Url; }
+								let sources = clone.find("source");
+								sources[0].srcset = product.MainImage;
+								sources[1].srcset = smallImage
+								let containers = clone.find("div.w3-container");
+								containers[1].innerText = product.Description;
 
-							let sources = clone.find("source");
-							sources[0].srcset = product.MainImage;
-							sources[1].srcset = smallImage
-							let containers = clone.find("div.w3-container");
-							containers[1].innerText = product.Description;
+								containers[2].innerText = product.CustomerFacingSize;
+								let button = clone.find("button").eq(0);
+								button.attr('data-upc', product.UPC);
+								button.attr('data-name', product.Description);
 
-							containers[2].innerText = product.CustomerFacingSize;
-							let button = clone.find("button").eq(0);
-							button.attr('data-upc', product.UPC);
-							button.attr('data-name', product.Description);
+								if (Object.keys(payload.upcs).indexOf(product.UPC) > -1) {
+									button.text("remove product");
+								}
 
-							if (Object.keys(payload.upcs).indexOf(product.UPC) > -1) {
-								button.text("remove product");
-							}
+								wrapper.append(clone);
 
-							wrapper.append(clone);
-
-						});
-
+							});
+						}
+						else {
+							noProductsMsg.show();
+						}
 						let s = document.querySelector('#productsSwiper').swiper;
 						s.removeAllSlides();
 						s.appendSlide(wrappers.map(function (w) { return w[0] }));
-
 					}
 
 					return engine;
@@ -753,10 +768,6 @@
 				var mock = false;
 
 			}
-			(adsbygoogle = window.adsbygoogle || []).push({
-				google_ad_client: "ca-pub-6675570834474275",
-				enable_page_level_ads: true
-			});
 
 			window.dataLayer = window.dataLayer || [];
 			function gtag() { dataLayer.push(arguments); }
@@ -768,10 +779,11 @@
 					'metric2': 'productSearchTerm',
 					'metric3': 'upcCount',
 					'metric4': 'storeCount',
-					'metric5': 'productName'}
+					'metric5': 'productName'
+				}
 			});
 		</script>
-		
+
 	</div>
 </body>
 </html>
