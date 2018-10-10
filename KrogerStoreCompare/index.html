@@ -389,7 +389,7 @@
 					else {
 						//add event
 						displayEngine.createMenuProductOption(e.detail);
-						gtag('event', 'addProduct', { 'event_category': 'add', 'productName': e.detail.Name });
+						gtag('event', 'addProduct', { 'event_category': 'add', 'event_label': e.detail.Name });
 					}
 
 				}
@@ -845,8 +845,8 @@
 			gtag('config', 'UA-126666332-1', {
 				'link_attribution': true,
 				'custom_map': {
-					'metric1': 'locationSearchTerm',
-					'metric2': 'productSearchTerm',
+					'dimension1': 'locationSearchTerm',
+					'dimension2': 'productSearchTerm',
 					'metric3': 'upcCount',
 					'metric4': 'storeCount',
 					'metric5': 'productName'
