@@ -76,7 +76,8 @@
 		<a id="infoOption" href="#" class="w3-bar-item w3-button">Info</a>
 	</div>
 	<div class="w3-container">
-		<button id="hamburger" class="w3-button w3-display-topleft w3-xlarge w3-theme">☰</button>
+		<button id="hamburger" class="w3-button w3-display-topleft w3-xlarge w3-theme">&#9776;</button>
+		<button id="questionmark" class="w3-button w3-display-topright w3-xlarge w3-theme">&#10067;</button>
 		<h2 class='w3-center'>Price Comparison</h2>
 		<label><b>City or Zipcode</b></label>
 
@@ -189,6 +190,36 @@
 				</div>
 			</div>
 		</div>
+		<div id="instructions" class="w3-modal">
+			<div class="w3-modal-content">
+				<div class="w3-container w3-large" style="max-height:300px; overflow-y:scroll">
+					<span onclick="document.getElementById('instructions').style.display='none'"
+						  class="w3-xlarge w3-button w3-display-topright w3-theme">&times;</span>
+					<h6>Instructions</h6>
+					<p>
+						The first search box is used to find stores.
+						Using a zipcode or city name you can find stores to add.  The results will appear below the bar.
+					</p>
+					<p>
+						After adding at least one store an additional search box will appear below the store search results.
+						Enter a product name into the second search bar, for example "doritos".  The results will appear below the bar.
+					</p>
+					<p>
+						After adding at least one product a button to fetch prices will appear below the product results.  Click the button to generate
+						a grid of product data for those products that have data available for at least one of the stores you selected.
+						If no data is available the product will not appear in the grid.
+					</p>
+					<p>
+						Use the menu icon at the top left to modify your current selections.
+					</p>
+					<p>
+						Use the help icon at the top right to open this information.
+					</p>
+					<h6>Note</h6>
+					<p>Some stores won't have any pricing data available.  Known stores without data: Kwik Shop, Quik Stop </p>
+				</div>
+			</div>
+		</div>
 		<div id="incompleteRequestMsg" class="w3-modal">
 			<div class="w3-modal-content">
 				<div class="w3-container">
@@ -222,6 +253,7 @@
 				addStoreSearchBindings();
 				addProductSearchBindings();
 				$("#hamburger").on("click", hamburgerBtn);
+				$("#questionmark").on("click", questionMarkBtn)
 				$("#closeMySidebar").on("click", closeSidebar);
 
 
@@ -269,6 +301,11 @@
 				function hamburgerBtn(e) {
 					$("#mySidebar").removeClass("w3-animate-right").addClass("w3-animate-left").show();
 				}
+				function questionMarkBtn(e) {
+					$("#instructions").show();
+					return false;
+				}
+
 
 				function closeSidebar(e) {
 					$("#mySidebar").hide();
@@ -584,7 +621,14 @@
 
 						storeProducts.forEach(function (product) {
 							let th = document.createElement("th");
-							th.innerText = product.Description + " " + product.CustomerFacingSize;
+							let isPerEach = product.PromoDescription.indexOf('About ') === 0 &&
+								product.PromoDescription.indexOf(' for each') > -1 &&
+								product.CustomerFacingSize.indexOf('price $') === 0 &&
+								product.OrderBy === 'Unit';
+							th.innerText = product.Description;
+							if (!isPerEach) { th.innerText += " " + product.CustomerFacingSize; }
+							
+							
 							headRow.appendChild(th)
 						})
 
@@ -600,19 +644,45 @@
 								cell.innerText = store.Name;
 								tr.appendChild(cell);
 								storeProducts.forEach(function (storeProduct) {
+									let isPerEach = storeProduct.PromoDescription.indexOf('About ') === 0 &&
+										storeProduct.PromoDescription.indexOf(' for each') > -1 &&
+										storeProduct.CustomerFacingSize.indexOf('price $') === 0 &&
+										storeProduct.OrderBy === 'Unit';
 									storePrice = storeProduct.StorePrices.filter(x => x.StoreIdentifier.DivisionId === store.DivisionId && x.StoreIdentifier.StoreId === store.StoreId)[0];
 									let priceCell = document.createElement("td");
 									if (!storePrice) {
 										priceCell.innerText = "N/A";
 									}
 									else if (storePrice.PriceSale) {
-										priceCell.innerText = storePrice.PriceSale + " ";
 										let sPrice = document.createElement("s");
-										sPrice.innerText = storePrice.PriceNormal;
-										priceCell.appendChild(sPrice);
-
+										
+										if (isPerEach) {
+											if (storePrice.CustomerFacingSize.indexOf("price $") === 0) {
+												sPrice.innerText = storePrice.CalculatedRegularPrice;
+												priceCell.appendChild(document.createTextNode(storePrice.CustomerFacingSize.replace("price ", "") + " "));
+												priceCell.appendChild(sPrice);
+											} else {
+												priceCell.innerText = "N/A"
+											}
+										} else {
+											sPrice.innerText = storePrice.PriceNormal;
+											priceCell.innerText = storePrice.PriceSale + " ";
+											priceCell.appendChild(sPrice);
+										}
 									} else {
-										priceCell.innerText = storePrice.PriceNormal;
+										let text = undefined;
+										if (isPerEach) {
+											if (storePrice.CustomerFacingSize.indexOf("price $") === 0) {
+												text = storePrice.CustomerFacingSize.replace("price ", "");
+											} else {
+												text = "N/A"
+											}
+											
+										}
+										else {
+											text = storePrice.PriceNormal;
+										}
+										priceCell.innerText = text;
 									}
 									tr.appendChild(priceCell);
 								});
