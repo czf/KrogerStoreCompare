@@ -769,6 +769,7 @@
 						let s = document.querySelector('#storesSwiper').swiper;
 						s.removeAllSlides();
 						s.appendSlide(wrappers.map(function (w) { return w[0] }));
+						s.slideTo(0);
 					};
 
 					engine.displayProductSearchResults = function (productData) {
@@ -821,6 +822,7 @@
 						let s = document.querySelector('#productsSwiper').swiper;
 						s.removeAllSlides();
 						s.appendSlide(wrappers.map(function (w) { return w[0] }));
+						s.slideTo(0);
 					}
 
 					return engine;
