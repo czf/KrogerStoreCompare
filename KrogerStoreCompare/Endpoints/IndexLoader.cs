@@ -16,8 +16,8 @@ namespace KrogerStoreCompare.Endpoints
         [FunctionName("IndexLoader")]
         public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)]HttpRequestMessage req, TraceWriter log, ExecutionContext context)
         {
-            log.Info("Index requested");
-
+            log.Info($"Index requested, User Agent: {req.Headers?.UserAgent?.ToString()} ");
+            
             var response = new HttpResponseMessage(HttpStatusCode.OK);
             var stream = new FileStream(context.FunctionAppDirectory + @"\index.html", FileMode.Open);
             response.Content = new StreamContent(stream);

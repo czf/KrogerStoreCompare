@@ -627,8 +627,8 @@
 								product.OrderBy === 'Unit';
 							th.innerText = product.Description;
 							if (!isPerEach) { th.innerText += " " + product.CustomerFacingSize; }
-							
-							
+
+
 							headRow.appendChild(th)
 						})
 
@@ -655,7 +655,7 @@
 									}
 									else if (storePrice.PriceSale) {
 										let sPrice = document.createElement("s");
-										
+
 										if (isPerEach) {
 											if (storePrice.CustomerFacingSize.indexOf("price $") === 0) {
 												sPrice.innerText = storePrice.CalculatedRegularPrice;
@@ -677,7 +677,7 @@
 											} else {
 												text = "N/A"
 											}
-											
+
 										}
 										else {
 											text = storePrice.PriceNormal;
@@ -855,7 +855,15 @@
 				}
 			});
 		</script>
+		<script type="text/javascript">
+			var appInsights = window.appInsights || function (a) {
+				function b(a) { c[a] = function () { var b = arguments; c.queue.push(function () { c[a].apply(c, b) }) } } var c = { config: a }, d = document, e = window; setTimeout(function () { var b = d.createElement("script"); b.src = a.url || "https://az416426.vo.msecnd.net/scripts/a/ai.0.js", d.getElementsByTagName("script")[0].parentNode.appendChild(b) }); try { c.cookie = d.cookie } catch (a) { } c.queue = []; for (var f = ["Event", "Exception", "Metric", "PageView", "Trace", "Dependency"]; f.length;)b("track" + f.pop()); if (b("setAuthenticatedUserContext"), b("clearAuthenticatedUserContext"), b("startTrackEvent"), b("stopTrackEvent"), b("startTrackPage"), b("stopTrackPage"), b("flush"), !a.disableExceptionTracking) { f = "onerror", b("_" + f); var g = e[f]; e[f] = function (a, b, d, e, h) { var i = g && g(a, b, d, e, h); return !0 !== i && c["_" + f](a, b, d, e, h), i } } return c
+			}({
+				instrumentationKey: "40aa22c3-aee0-4a78-b812-f5cde27e7322"
+			});
 
+			window.appInsights = appInsights, appInsights.queue && 0 === appInsights.queue.length && appInsights.trackPageView();
+		</script>
 	</div>
 </body>
 </html>
