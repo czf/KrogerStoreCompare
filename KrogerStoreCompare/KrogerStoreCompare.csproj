@@ -22,7 +22,7 @@
     <PackageReference Include="AutoMapper" Version="7.0.1" />
     <PackageReference Include="Czf.apiwrapper.Kroger" Version="2.0.0" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.22" />
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
